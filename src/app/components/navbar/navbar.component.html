@@ -1,0 +1,16 @@
+<nav>
+    <a routerLink="/">Home</a> |
+    <a routerLink="/products">Products</a> |
+    <a routerLink="/categories">Categories</a> |
+    <a routerLink="/orders">Orders</a> |
+    <a routerLink="/orders/new">Place Order</a>
+    <span *ngIf="authService.isLoggedIn()">
+      <button (click)="logout()">Logout</button>
+    </span>
+    <span *ngIf="!authService.isLoggedIn()">
+      <a routerLink="/login">Login</a> |
+      <a routerLink="/register">Register</a>
+    </span>
+  </nav>
+  <hr>
+  

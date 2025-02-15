@@ -1,0 +1,12 @@
+<h2>Your Orders</h2>
+<div *ngIf="error">{{ error }}</div>
+<div *ngFor="let order of orders">
+  <h3>Order #{{ order.id }} - Total: {{ order.totalPrice }}</h3>
+  <p>Created At: {{ order.createdAt }}</p>
+  <ul>
+    <li *ngFor="let item of order.items">
+      Product ID: {{ item.productId }}, Quantity: {{ item.quantity }}, Price: {{ item.price }}
+    </li>
+  </ul>
+  <hr>
+</div>

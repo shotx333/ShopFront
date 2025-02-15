@@ -1,0 +1,13 @@
+<h2>Place Order</h2>
+<form [formGroup]="orderForm" (ngSubmit)="placeOrder()">
+  <div formArrayName="items">
+    <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
+      <label>Product ID: <input formControlName="productId"></label>
+      <label>Quantity: <input type="number" formControlName="quantity"></label>
+      <button type="button" (click)="removeItem(i)">Remove</button>
+    </div>
+  </div>
+  <button type="button" (click)="addItem()">Add Item</button><br>
+  <button type="submit">Place Order</button>
+</form>
+<div *ngIf="error">{{ error }}</div>

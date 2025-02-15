@@ -1,0 +1,12 @@
+<h2>Products</h2>
+<div *ngIf="error">{{ error }}</div>
+<ul>
+  <li *ngFor="let product of products">
+    <div>
+      <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="{{ product.name }}" style="max-width: 200px;">
+    </div>
+    <strong>{{ product.name }}</strong> - {{ product.description }} - {{ product.price | currency }}<br>
+    Category: {{ product.category?.name }}
+    <button (click)="addToCart(product)">Add to Cart</button>
+  </li>
+</ul>
