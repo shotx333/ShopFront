@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CategoryService } from '../../services/category.service';
+import { CategoryService } from '../../../services/category.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-category-form',
   templateUrl: './category-form.component.html',
     imports: [ReactiveFormsModule, CommonModule]
-  
+
 })
 export class CategoryFormComponent {
   categoryForm: FormGroup;
@@ -30,7 +30,7 @@ export class CategoryFormComponent {
       return;
     }
     this.categoryService.createCategory(this.categoryForm.value).subscribe({
-      next: () => this.router.navigate(['/categories']),
+      next: () => this.router.navigate(['admin/categories']),
       error: () => this.error = 'Error creating category'
     });
   }

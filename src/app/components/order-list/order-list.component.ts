@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderService, Order } from '../../services/order.service';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-order-list',
   templateUrl: './order-list.component.html',
-  standalone:false
+imports:[CommonModule]
 })
 export class OrderListComponent implements OnInit {
   orders: Order[] = [];

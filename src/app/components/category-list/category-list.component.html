@@ -3,5 +3,7 @@
 <ul>
   <li *ngFor="let category of categories">
     {{ category.name }}
+    <!-- Only show delete button if admin -->
+    <button *ngIf="isAdmin" (click)="deleteCategory(category.id!)" style="margin-left: 10px;">Delete</button>
   </li>
 </ul>

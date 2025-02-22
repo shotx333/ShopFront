@@ -15,6 +15,7 @@ export class AuthService {
 
   login(username: string, password: string): Observable<any> {
     // Send credentials in the body instead of as query parameters.
+
     return this.http.post(
       `${this.authUrl}/login`,
       { username, password },  // <-- JSON body payload
@@ -23,7 +24,7 @@ export class AuthService {
       tap(token => {
         localStorage.setItem(this.tokenKey, token);
         // For demo purposes, assign role based on username.
-        this.currentUserRole.next(username === 'admin' ? 'ADMIN' : 'USER');
+        this.currentUserRole.next(username === 'shotx' ? 'ADMIN' : 'USER');
       })
     );
   }
@@ -45,7 +46,7 @@ export class AuthService {
 
   // register(username: string, password: string, role: string)
   // register(username: string, password: string)
-  
+
   // : Observable<any> {
   //   return this.http.post(`${this.authUrl}/register`, { username, password }, { params: { username, password } });
   // }

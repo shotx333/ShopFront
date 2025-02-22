@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { ProductService, Product } from '../../services/product.service';
-import { CategoryService, Category } from '../../services/category.service';
+import { ProductService, Product } from '../../../services/product.service';
+import { CategoryService, Category } from '../../../services/category.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import {TwoDecimalBlockDirective} from '../../../two-decimal-block.directive';
 
 @Component({
   selector: 'app-product-form',
   templateUrl: './product-form.component.html',
-  imports: [ReactiveFormsModule,CommonModule]
+  imports: [ReactiveFormsModule, CommonModule, TwoDecimalBlockDirective]
 })
 export class ProductFormComponent implements OnInit {
   productForm: FormGroup;
@@ -56,11 +57,11 @@ export class ProductFormComponent implements OnInit {
         if (this.selectedFile) {
           // After product creation, upload the image file.
           this.productService.uploadImage(createdProduct.id!, this.selectedFile).subscribe({
-            next: () => this.router.navigate(['/products']),
+            next: () => this.router.navigate(['admin/products']),
             error: () => this.error = 'Product created but image upload failed'
           });
         } else {
-          this.router.navigate(['/products']);
+          this.router.navigate(['admin/products']);
         }
       },
       error: () => this.error = 'Error creating product'

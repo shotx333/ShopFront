@@ -27,14 +27,14 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     // If user is already logged in, redirect them away from the login page.
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/']).then(() => {});
     }
   }
 
   login(): void {
     const { username, password } = this.loginForm.value;
     this.authService.login(username, password).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => this.router.navigate(['/products']),
       error: () => this.error = 'Login failed'
     });
   }

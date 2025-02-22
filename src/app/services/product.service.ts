@@ -51,8 +51,6 @@ export class ProductService {
     return this.http.post<Product>(`${this.baseUrl}/${productId}/upload-image`, formData);
   }
 
-  getFullImageUrl(relativeUrl: string): string {
-    return `http://localhost:8080${relativeUrl}`;
-  }
-  
+
+
 }

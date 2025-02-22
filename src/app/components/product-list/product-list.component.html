@@ -3,10 +3,12 @@
 <ul>
   <li *ngFor="let product of products">
     <div>
-      <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="{{ product.name }}" style="max-width: 200px;">
+      <img *ngIf="product.imageUrl" ngSrc="{{baseUrl+product.imageUrl}}" alt="{{ product.name }}" width="150"
+           height="150">
     </div>
-    <strong>{{ product.name }}</strong> - {{ product.description }} - {{ product.price | currency }}<br>
-    Category: {{ product.category?.name }}
+    <strong>{{ product.name }}</strong> - {{ product.description }} - {{ product.price }}<br>
+    Category: {{ product.category?.name }}<br>
     <button (click)="addToCart(product)">Add to Cart</button>
+    <!-- Only show delete button if admin -->
   </li>
 </ul>
