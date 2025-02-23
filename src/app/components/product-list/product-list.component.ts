@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService, Product } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
-import { AuthService } from '../../services/auth.service';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
+import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
 import baseUrl from '../../services/helper';
-
 
 @Component({
   selector: 'app-product-list',
-  templateUrl: './product-list.component.html',
-  imports: [CommonModule, NgOptimizedImage]
+  imports: [
+    NgIf,
+    NgOptimizedImage,
+    NgForOf
+  ],
+  templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
@@ -17,7 +19,7 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private cartService: CartService,
+    private cartService: CartService
   ) { }
 
   ngOnInit() {
@@ -26,8 +28,17 @@ export class ProductListComponent implements OnInit {
 
   loadProducts() {
     this.productService.getProducts().subscribe({
-      next: data => this.products = data,
-      error: () => this.error = 'Error fetching products',
+      next: data => {
+        this.products = data;
+        this.error = '';
+      },
+      error: (err) => {
+        if (err.status === 401 || err.status === 403) {
+          this.error = 'Please log in';
+        } else {
+          this.error = 'Error fetching products';
+        }
+      }
     });
   }
 

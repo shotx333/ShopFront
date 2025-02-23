@@ -14,7 +14,7 @@ import { CartComponent } from './components/cart/cart.component';
 // Export the routes so that they can be imported elsewhere.
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: '', component: LoginComponent },
+  { path: '', component: ProductListComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'products', component: ProductListComponent },
   { path: 'products/new', component: ProductFormComponent },

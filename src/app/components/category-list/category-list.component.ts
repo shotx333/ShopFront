@@ -11,17 +11,14 @@ import {CommonModule} from '@angular/common';
 export class CategoryListComponent implements OnInit {
   categories: Category[] = [];
   error: string = '';
-  isAdmin: boolean = false;
 
   constructor(
     private categoryService: CategoryService,
-    private authService: AuthService
   ) {
   }
 
   ngOnInit() {
     this.loadCategories();
-    this.isAdmin = this.authService.currentUserRole.getValue() === 'ADMIN';
   }
 
   loadCategories() {
@@ -31,15 +28,4 @@ export class CategoryListComponent implements OnInit {
     });
   }
 
-  deleteCategory(id: number) {
-    if (confirm('Are you sure you want to delete this category?')) {
-      this.categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          alert('Category deleted.');
-          this.loadCategories(); // refresh the list after deletion
-        },
-        error: () => alert('Error deleting category.')
-      });
-    }
-  }
 }
