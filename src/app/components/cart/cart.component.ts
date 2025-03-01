@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { CartService, Cart } from '../../services/cart.service';
+import {CartService, Cart, CartItem} from '../../services/cart.service';
 import { OrderService } from '../../services/order.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
-  imports: [CommonModule]
+  imports: [CommonModule, FormsModule]
 })
 export class CartComponent implements OnInit {
   cart: Cart | null = null;
@@ -58,6 +59,22 @@ export class CartComponent implements OnInit {
         this.router.navigate(['/orders']);
       },
       error: () => this.error = 'Error placing order'
+    });
+  }
+  // src/app/components/cart/cart.component.ts - Add this method
+  validateQuantity(item: CartItem) {
+    if (item.quantity < 1) {
+      item.quantity = 1;
+    }
+  }
+
+  updateItem(productId: number, quantity: number) {
+    if (quantity < 1) {
+      quantity = 1;
+    }
+    this.cartService.updateItem(productId, quantity).subscribe({
+      next: (cart) => this.cart = cart,
+      error: () => this.error = 'Error updating item'
     });
   }
 }

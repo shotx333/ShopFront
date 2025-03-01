@@ -1,20 +1,27 @@
+// src/app/components/product-list/product-list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ProductService, Product } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
-import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
+import { NgForOf, NgIf, NgOptimizedImage } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import baseUrl from '../../services/helper';
+
+interface ProductWithQuantity extends Product {
+  quantityToAdd?: number;
+}
 
 @Component({
   selector: 'app-product-list',
   imports: [
     NgIf,
     NgOptimizedImage,
-    NgForOf
+    NgForOf,
+    FormsModule
   ],
   templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {
-  products: Product[] = [];
+  products: ProductWithQuantity[] = [];
   error: string = '';
 
   constructor(
@@ -29,7 +36,10 @@ export class ProductListComponent implements OnInit {
   loadProducts() {
     this.productService.getProducts().subscribe({
       next: data => {
-        this.products = data;
+        this.products = data.map(product => ({
+          ...product,
+          quantityToAdd: 1
+        }));
         this.error = '';
       },
       error: (err) => {
@@ -42,10 +52,22 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  addToCart(product: Product) {
-    this.cartService.addItem(product.id!, 1).subscribe({
-      next: () => alert(`${product.name} added to cart.`),
-      error: () => alert('Error adding product to cart.')
+  validateQuantity(product: ProductWithQuantity) {
+    if (!product.quantityToAdd || product.quantityToAdd < 1) {
+      product.quantityToAdd = 1;
+    }
+  }
+
+  addToCart(product: ProductWithQuantity) {
+    const quantity = product.quantityToAdd || 1;
+    if (quantity < 1) {
+      alert('Quantity must be at least 1');
+      return;
+    }
+
+    this.cartService.addItem(product.id!, quantity).subscribe({
+      next: () => alert(`${quantity} ${product.name}(s) added to cart.`),
+      error: (err) => alert(err.error || 'Error adding product to cart.')
     });
   }
 

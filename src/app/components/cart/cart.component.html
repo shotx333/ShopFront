@@ -1,19 +1,23 @@
+<!-- src/app/components/cart/cart.component.html -->
 <h2>Your Cart</h2>
 <div *ngIf="error" style="color: red;">{{ error }}</div>
-<table  *ngIf="cart && cart.items.length">
+<table *ngIf="cart && cart.items.length">
   <thead>
-    <tr>
-      <th>Product ID</th>
-      <th>Quantity</th>
-      <th>Remove</th>
-    </tr>
+  <tr>
+    <th>Product ID</th>
+    <th>Quantity</th>
+    <th>Actions</th>
+  </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let item of cart.items">
-      <td>{{ item.productId }}</td>
-      <td>{{ item.quantity }}</td>
-      <td><button (click)="removeItem(item.productId)">Remove</button></td>
-    </tr>
+  <tr *ngFor="let item of cart.items">
+    <td>{{ item.productId }}</td>
+    <td>
+      <input type="number" min="1" [(ngModel)]="item.quantity" (change)="validateQuantity(item)">
+      <button (click)="updateItem(item.productId, item.quantity)">Update</button>
+    </td>
+    <td><button (click)="removeItem(item.productId)">Remove</button></td>
+  </tr>
   </tbody>
 </table>
 <div *ngIf="cart && cart.items.length === 0">
