@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -9,14 +9,17 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.component.html',
   imports:[CommonModule,ReactiveFormsModule]
 })
+
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   error: string = '';
+  info: string = '';
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
       username: [''],
@@ -25,16 +28,23 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // If user is already logged in, redirect them away from the login page.
+    // If already logged in, redirect to home
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/']).then(() => {});
+      this.router.navigate(['/']);
     }
+
+    // Check if user was just registered
+    this.route.queryParams.subscribe(params => {
+      if (params['registered'] === 'true') {
+        this.info = 'Registration successful, please log in';
+      }
+    });
   }
 
   login(): void {
     const { username, password } = this.loginForm.value;
     this.authService.login(username, password).subscribe({
-      next: () => this.router.navigate(['/products']),
+      next: () => this.router.navigate(['/']),
       error: () => this.error = 'Login failed'
     });
   }

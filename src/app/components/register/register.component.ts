@@ -21,12 +21,19 @@ export class RegisterComponent {
     });
   }
 
-  register() {
-    const { username, password} = this.registerForm.value;
-    // const { username, password, role } = this.registerForm.value;
-    this.authService.register(username, password).subscribe({
-      next: () => this.router.navigate(['/login']),
-      error: () => this.error = 'Registration failed'
-    });
-  }
+register() {
+  const { username, password } = this.registerForm.value;
+  // this.authService.register(username, password, role).subscribe({
+  this.authService.register(username, password).subscribe({
+    next: () => {
+      // After successful registration, immediately log the user in.
+      this.authService.login(username, password).subscribe({
+        next: () => this.router.navigate(['/']),
+        error: () => this.error = 'Login failed after registration'
+      });
+    },
+    error: () => this.error = 'Registration failed'
+  });
+}
+
 }
