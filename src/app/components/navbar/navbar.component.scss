@@ -1,0 +1,45 @@
+/* Dropdown styles */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    
+    .dropdown-toggle {
+      cursor: pointer;
+      
+      &:after {
+        content: " ▼";
+        font-size: 0.8em;
+        vertical-align: middle;
+      }
+    }
+    
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      
+      a {
+        padding: 8px 12px;
+        text-decoration: none;
+        display: block;
+        color: black;
+        
+        &:hover {
+          background-color: #f1f1f1;
+        }
+      }
+    }
+    
+    &:hover .dropdown-menu {
+      display: block;
+    }
+  }
+  
+  nav {
+    a, button {
+      margin: 0 5px;
+    }
+  }

@@ -12,6 +12,7 @@ export interface Product {
   name: string;
   description?: string;
   price: number;
+  stock?: number;
   category: Category;
   imageUrl?: string;
 }
@@ -44,13 +45,10 @@ export class ProductService {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 
-  // New method to upload an image for a product
+  // Upload an image for a product
   uploadImage(productId: number, file: File): Observable<Product> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<Product>(`${this.baseUrl}/${productId}/upload-image`, formData);
   }
-
-
-
 }

@@ -1,26 +1,49 @@
-<!-- src/app/components/cart/cart.component.html -->
 <h2>Your Cart</h2>
 <div *ngIf="error" style="color: red;">{{ error }}</div>
 <table *ngIf="cart && cart.items.length">
   <thead>
-  <tr>
-    <th>Product ID</th>
-    <th>Quantity</th>
-    <th>Actions</th>
-  </tr>
+    <tr>
+      <th>Product</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Subtotal</th>
+      <th>Actions</th>
+    </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let item of cart.items">
-    <td>{{ item.productId }}</td>
-    <td>
-      <input type="number" min="1" [(ngModel)]="item.quantity" (change)="validateQuantity(item)">
-      <button (click)="updateItem(item.productId, item.quantity)">Update</button>
-    </td>
-    <td><button (click)="removeItem(item.productId)">Remove</button></td>
-  </tr>
+    <tr *ngFor="let item of cart.items">
+      <td>
+        <ng-container *ngIf="getProductInfo(item.productId) as product">
+          {{ product.name }}
+          <div *ngIf="product.stock !== undefined && product.stock < item.quantity" class="stock-warning">
+            Only {{ product.stock }} in stock
+          </div>
+        </ng-container>
+      </td>
+      <td>{{ getProductPrice(item.productId) }}</td>
+      <td>
+        <input type="number" min="1" [(ngModel)]="item.quantity" (change)="validateQuantity(item)">
+        <button (click)="updateItem(item.productId, item.quantity)">Update</button>
+      </td>
+      <td>{{ getItemSubtotal(item) }}</td>
+      <td><button (click)="removeItem(item.productId)">Remove</button></td>
+    </tr>
   </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3" class="text-right"><strong>Total:</strong></td>
+      <td colspan="2"><strong>{{ getCartTotal() }}</strong></td>
+    </tr>
+  </tfoot>
 </table>
 <div *ngIf="cart && cart.items.length === 0">
   Your cart is empty.
 </div>
-<button (click)="placeOrder()">Place Order with All Items</button>
+
+<div *ngIf="hasStockIssues()" class="stock-warning">
+  Some items in your cart exceed available stock. Please update quantities before placing your order.
+</div>
+
+<button [disabled]="hasStockIssues() || !cart || !cart.items.length" (click)="placeOrder()">
+  Place Order with All Items
+</button>

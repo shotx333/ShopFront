@@ -1,18 +1,38 @@
-<!-- src/app/components/product-list/product-list.component.html -->
 <h2>Products</h2>
 <div *ngIf="error">{{ error }}</div>
+
+<!-- Show the selected category name if a category is selected -->
+<div class="category-info" *ngIf="selectedCategoryId !== 0">
+  <h3>Category: {{ getCategoryName(selectedCategoryId) }}</h3>
+</div>
+
 <ul>
-  <li *ngFor="let product of products">
+  <li *ngFor="let product of filteredProducts">
     <div>
       <img *ngIf="product.imageUrl" ngSrc="{{baseUrl+product.imageUrl}}" alt="{{ product.name }}" width="150"
            height="150">
     </div>
     <strong>{{ product.name }}</strong> - {{ product.description }} - {{ product.price }}<br>
     Category: {{ product.category?.name }}<br>
-
-    <div class="add-to-cart-controls">
-      <input type="number" [(ngModel)]="product.quantityToAdd" min="1" [value]="1" (change)="validateQuantity(product)">
-      <button [disabled]="!product.quantityToAdd || product.quantityToAdd < 1" (click)="addToCart(product)">Add to Cart</button>
+    
+    <div class="stock-info" [ngClass]="{
+      'out-of-stock': product.stock !== undefined && product.stock === 0,
+      'low-stock': product.stock !== undefined && product.stock > 0 && product.stock < 5
+    }">
+      <span *ngIf="product.stock !== undefined && product.stock === 0">Out of Stock</span>
+      <span *ngIf="product.stock !== undefined && product.stock > 0 && product.stock < 5">Low Stock: {{ product.stock }} left</span>
+      <span *ngIf="product.stock === undefined || product.stock >= 5">In Stock: {{ product.stock }} available</span>
+    </div>
+    
+    <div class="add-to-cart-controls" *ngIf="product.stock !== undefined && product.stock > 0">
+      <input type="number" [(ngModel)]="product.quantityToAdd" min="1" [max]="product.stock" [value]="1" (change)="validateQuantity(product)">
+      <button [disabled]="!product.quantityToAdd || product.quantityToAdd < 1 || (product.stock !== undefined && product.quantityToAdd > product.stock)" (click)="addToCart(product)">
+        Add to Cart
+      </button>
     </div>
   </li>
 </ul>
+
+<div *ngIf="filteredProducts.length === 0">
+  No products found in this category.
+</div>

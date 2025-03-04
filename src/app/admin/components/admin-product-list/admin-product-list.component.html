@@ -1,12 +1,13 @@
 <h2>Admin - Product Management</h2>
 <div *ngIf="error" style="color: red;">{{ error }}</div>
-<table >
+<table>
   <thead>
   <tr>
     <th>ID</th>
     <th>Name</th>
     <th>Description</th>
     <th>Price</th>
+    <th>Stock</th>
     <th>Category</th>
     <th>Image</th>
     <th>Actions</th>
@@ -17,17 +18,35 @@
     <td>{{ product.id }}</td>
     <td>{{ product.name }}</td>
     <td>{{ product.description }}</td>
-<!--    <td>{{ product.price | currency }}</td>-->
     <td>{{ product.price }}</td>
+    <td [ngClass]="{'low-stock': product.stock !== undefined && product.stock < 5}">{{ product.stock }}</td>
     <td>{{ product.category?.name }}</td>
     <td>
       <img *ngIf="product.imageUrl" ngSrc="{{baseUrl+product.imageUrl}}" alt="{{ product.name }}" width="100" height="100">
     </td>
     <td>
       <button (click)="deleteProduct(product.id!)">Delete</button>
-      <!-- You can add an Edit button here if needed -->
+      <button (click)="openStockUpdateModal(product)">Update Stock</button>
     </td>
   </tr>
   </tbody>
 </table>
 <a routerLink="/admin/products/new">Add New Product</a>
+
+<!-- Stock Update Modal -->
+<div *ngIf="showStockModal" class="modal">
+  <div class="modal-content">
+    <h3>Update Stock for {{ selectedProduct?.name }}</h3>
+    <p>Current Stock: {{ selectedProduct?.stock }}</p>
+    <form (ngSubmit)="updateStock()">
+      <label>
+        New Stock Quantity:
+        <input type="number" [(ngModel)]="newStockValue" [ngModelOptions]="{standalone: true}" min="0">
+      </label>
+      <div class="modal-actions">
+        <button type="button" (click)="closeStockModal()">Cancel</button>
+        <button [disabled]="newStockValue < 0 || selectedProduct?.stock === undefined" type="submit">Update</button>
+      </div>
+    </form>
+  </div>
+</div>

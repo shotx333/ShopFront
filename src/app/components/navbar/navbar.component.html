@@ -1,15 +1,27 @@
 <nav>
-    <a routerLink="/">Home</a> |
-    <a routerLink="/products">Products</a> |
-    <a routerLink="/categories">Categories</a> |
-    <a routerLink="/cart">Cart</a> |
-    <a routerLink="/orders">Orders</a> |
-    <span *ngIf="authService.isLoggedIn()">
-      <button (click)="logout()">Logout</button>
-    </span>
-    <span *ngIf="!authService.isLoggedIn()">
-      <a routerLink="/login">Login</a> |
-      <a routerLink="/register">Register</a>
-    </span>
-  </nav>
-  <hr>
+  <a routerLink="/">Home</a> |
+  <a routerLink="/products">Products</a> |
+  
+  <div class="dropdown">
+    <a class="dropdown-toggle">Categories</a>
+    <div class="dropdown-menu">
+      <a routerLink="/products" [queryParams]="{categoryId: 0}">All Categories</a>
+      <a *ngFor="let category of categories" 
+         routerLink="/products" 
+         [queryParams]="{categoryId: category.id}">
+        {{ category.name }}
+      </a>
+    </div>
+  </div> |
+  
+  <a routerLink="/cart">Cart</a> |
+  <a routerLink="/orders">Orders</a> |
+  <span *ngIf="authService.isLoggedIn()">
+    <button (click)="logout()">Logout</button>
+  </span>
+  <span *ngIf="!authService.isLoggedIn()">
+    <a routerLink="/login">Login</a> |
+    <a routerLink="/register">Register</a>
+  </span>
+</nav>
+<hr>

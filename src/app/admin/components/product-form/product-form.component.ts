@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProductService, Product } from '../../../services/product.service';
 import { CategoryService, Category } from '../../../services/category.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import {TwoDecimalBlockDirective} from '../../../two-decimal-block.directive';
+import { TwoDecimalBlockDirective } from '../../../two-decimal-block.directive';
 
 @Component({
   selector: 'app-product-form',
@@ -24,10 +24,11 @@ export class ProductFormComponent implements OnInit {
     private router: Router
   ) {
     this.productForm = this.fb.group({
-      name: [''],
+      name: ['', Validators.required],
       description: [''],
-      price: [''],
-      categoryId: ['']
+      price: ['', [Validators.required, Validators.min(0)]],
+      stock: [0, [Validators.required, Validators.min(0)]],
+      categoryId: ['', Validators.required]
     });
   }
 
@@ -45,13 +46,20 @@ export class ProductFormComponent implements OnInit {
   }
 
   createProduct() {
+    if (this.productForm.invalid) {
+      this.error = 'Please fill all required fields correctly';
+      return;
+    }
+    
     const formValue = this.productForm.value;
     const product: Product = {
       name: formValue.name,
       description: formValue.description,
       price: Number(formValue.price),
+      stock: Number(formValue.stock),
       category: { id: Number(formValue.categoryId), name: '' } // Only ID is needed
     };
+    
     this.productService.createProduct(product).subscribe({
       next: (createdProduct) => {
         if (this.selectedFile) {

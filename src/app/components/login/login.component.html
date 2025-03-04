@@ -1,6 +1,6 @@
 <!-- login.component.html -->
 <h2>Login</h2>
-<div *ngIf="info" style="color: green;">{{ info }}</div>
+<!-- <div *ngIf="info" style="color: green;">{{ info }}</div> -->
 <form [formGroup]="loginForm" (ngSubmit)="login()">
   <label>Username: <input formControlName="username"></label><br>
   <label>Password: <input type="password" formControlName="password"></label><br>

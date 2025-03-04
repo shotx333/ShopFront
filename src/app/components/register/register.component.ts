@@ -32,7 +32,7 @@ register() {
         error: () => this.error = 'Login failed after registration'
       });
     },
-    error: () => this.error = 'Registration failed'
+    error: (err) => this.error = err.error || 'Registration failed'
   });
 }
 
