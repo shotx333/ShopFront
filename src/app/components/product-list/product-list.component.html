@@ -8,31 +8,67 @@
 
 <ul>
   <li *ngFor="let product of filteredProducts">
-    <div>
-      <img *ngIf="product.imageUrl" ngSrc="{{baseUrl+product.imageUrl}}" alt="{{ product.name }}" width="150"
+    <div class="product-image-carousel" *ngIf="product.images && product.images.length > 0">
+      <div class="carousel-inner">
+        <img *ngFor="let image of product.images; let i = index"
+             [src]="baseUrl+image.imageUrl"
+             alt="{{ product.name }}"
+             [class.active]="i === getActiveImageIndex(product)"
+             (click)="openFullImage(baseUrl+image.imageUrl, product.name)">
+      </div>
+
+      <div class="carousel-indicators" *ngIf="product.images.length > 1">
+        <span *ngFor="let image of product.images; let i = index"
+              [class.active]="i === getActiveImageIndex(product)"
+              (click)="setActiveImage(product, i)"></span>
+      </div>
+
+      <div class="carousel-controls" *ngIf="product.images.length > 1">
+        <button class="prev" (click)="prevImage(product)">&lt;</button>
+        <button class="next" (click)="nextImage(product)">&gt;</button>
+      </div>
+    </div>
+
+    <!-- Fallback for products without multiple images -->
+    <div *ngIf="!product.images || product.images.length === 0">
+      <img *ngIf="product.imageUrl" [src]="baseUrl+product.imageUrl" alt="{{ product.name }}" width="150"
            height="150">
     </div>
-    <strong>{{ product.name }}</strong> - {{ product.description }} - {{ product.price }}<br>
-    Category: {{ product.category?.name }}<br>
-    
-    <div class="stock-info" [ngClass]="{
-      'out-of-stock': product.stock !== undefined && product.stock === 0,
-      'low-stock': product.stock !== undefined && product.stock > 0 && product.stock < 5
-    }">
-      <span *ngIf="product.stock !== undefined && product.stock === 0">Out of Stock</span>
-      <span *ngIf="product.stock !== undefined && product.stock > 0 && product.stock < 5">Low Stock: {{ product.stock }} left</span>
-      <span *ngIf="product.stock === undefined || product.stock >= 5">In Stock: {{ product.stock }} available</span>
+
+    <div class="product-info">
+      <strong>{{ product.name }}</strong> - {{ product.description }} - {{ product.price }}<br>
+      Category: {{ product.category?.name }}<br>
+
+      <div class="stock-info" [ngClass]="{
+  'out-of-stock': (product.stock ?? 0) === 0,
+  'low-stock': (product.stock ?? 0) > 0 && (product.stock ?? 0) < 5
+}">
+        <span *ngIf="(product.stock ?? 0) === 0">Out of Stock</span>
+        <span *ngIf="(product.stock ?? 0) > 0 && (product.stock ?? 0) < 5">Low Stock: {{ product.stock ?? 0 }} left</span>
+        <span *ngIf="(product.stock ?? 0) >= 5">In Stock: {{ product.stock ?? 0 }} available</span>
+      </div>
+
+      <div class="add-to-cart-controls" *ngIf="(product.stock ?? 0) > 0">
+        <input type="number" [(ngModel)]="product.quantityToAdd" min="1" [max]="product.stock ?? 0" [value]="1" (change)="validateQuantity(product)">
+        <button [disabled]="!product.quantityToAdd || product.quantityToAdd < 1 || product.quantityToAdd > (product.stock ?? 0)" (click)="addToCart(product)">
+          Add to Cart
+        </button>
+      </div>
+
+
     </div>
-    
-    <div class="add-to-cart-controls" *ngIf="product.stock !== undefined && product.stock > 0">
-      <input type="number" [(ngModel)]="product.quantityToAdd" min="1" [max]="product.stock" [value]="1" (change)="validateQuantity(product)">
-      <button [disabled]="!product.quantityToAdd || product.quantityToAdd < 1 || (product.stock !== undefined && product.quantityToAdd > product.stock)" (click)="addToCart(product)">
-        Add to Cart
-      </button>
-    </div>
+
   </li>
 </ul>
 
 <div *ngIf="filteredProducts.length === 0">
   No products found in this category.
+</div>
+
+<!-- Fullsize image modal -->
+<div class="image-modal" *ngIf="fullImageUrl" (click)="closeFullImage()">
+  <div class="image-modal-content">
+    <img [src]="fullImageUrl" [alt]="fullImageAlt">
+    <span class="close-button" (click)="closeFullImage()">&times;</span>
+  </div>
 </div>

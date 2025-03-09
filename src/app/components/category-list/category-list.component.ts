@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {CategoryService, Category} from '../../services/category.service';
-import {AuthService} from '../../services/auth.service';
 import {CommonModule} from '@angular/common';
 
 @Component({

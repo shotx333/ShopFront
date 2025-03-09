@@ -16,9 +16,26 @@
       </option>
     </select>
   </label><br>
-  <label>Product Image:
-    <input type="file" (change)="onFileSelected($event)">
-  </label><br>
-  <button type="submit">Create Product</button>
+
+  <div class="image-upload-section">
+    <label>Product Images:
+      <input type="file" multiple (change)="onFilesSelected($event)" accept="image/*">
+    </label>
+
+    <div class="image-previews" *ngIf="previewUrls.length > 0">
+      <div class="image-preview" *ngFor="let previewUrl of previewUrls; let i = index"
+           [class.primary]="i === primaryImageIndex">
+        <img [src]="previewUrl" alt="Preview">
+        <div class="image-actions">
+          <button type="button" (click)="setPrimaryImage(i)" [disabled]="i === primaryImageIndex">
+            {{ i === primaryImageIndex ? 'Primary Image' : 'Set as Primary' }}
+          </button>
+          <button type="button" (click)="removeImage(i)">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="productForm.invalid || productImages.length === 0">Create Product</button>
 </form>
 <div *ngIf="error" style="color: red;">{{ error }}</div>

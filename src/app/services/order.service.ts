@@ -15,6 +15,8 @@ export interface Order {
   createdAt?: string;
   items: OrderItem[];
   totalPrice?: number;
+  paymentStatus?: string;
+  paymentIntentId?: string;
 }
 
 @Injectable({
@@ -25,11 +27,22 @@ export class OrderService {
 
   constructor(private http: HttpClient) { }
 
-  placeOrder(orderItems: OrderItem[]): Observable<Order> {
-    return this.http.post<Order>(this.baseUrl, orderItems);
+  placeOrder(orderItems: OrderItem[]): Observable<any> {
+    return this.http.post<any>(this.baseUrl, orderItems);
   }
 
   getOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(this.baseUrl);
+  }
+
+  getOrder(id: number): Observable<Order> {
+    return this.http.get<Order>(`${this.baseUrl}/${id}`);
+  }
+
+  // Changed from PATCH to POST to avoid CORS issues
+  updateOrderPaymentStatus(id: number, status: string): Observable<Order> {
+    return this.http.post<Order>(`${this.baseUrl}/${id}/payment-status`, null, {
+      params: { status }
+    });
   }
 }

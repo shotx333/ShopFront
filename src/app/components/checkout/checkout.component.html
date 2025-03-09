@@ -1,0 +1,65 @@
+<div class="checkout-container">
+  <h2>Checkout</h2>
+
+  <div *ngIf="!order" class="loading">
+    Loading order details...
+  </div>
+
+  <div *ngIf="order">
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <table>
+        <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let item of order.items">
+          <td>Product #{{ item.productId }}</td>
+          <td>${{ item.price | number:'1.2-2' }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>${{ (item.price ?? 0) * (item.quantity ?? 1) | number:'1.2-2' }}</td>        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+          <td colspan="3" class="text-right"><strong>Total:</strong></td>
+          <td><strong>${{ order.totalPrice | number:'1.2-2' }}</strong></td>
+        </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="payment-container" *ngIf="!paymentSuccess">
+      <h3>Payment Details</h3>
+      <p class="test-mode-notice">
+        <strong>Test Mode:</strong> Use card number 4242 4242 4242 4242, any future expiration date, any CVC, and any postal code.
+      </p>
+
+      <div class="card-element-container">
+        <div #cardElement></div>
+        <div id="card-errors" class="error" role="alert"></div>
+      </div>
+
+      <div *ngIf="paymentError" class="error payment-error">
+        {{ paymentError }}
+      </div>
+
+      <div class="actions">
+        <button class="cancel-btn" (click)="cancelPayment()" [disabled]="processingPayment">Cancel</button>
+        <button class="pay-btn" (click)="handleSubmit()" [disabled]="processingPayment">
+          <span *ngIf="!processingPayment">Pay ${{ order.totalPrice | number:'1.2-2' }}</span>
+          <span *ngIf="processingPayment">Processing...</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="payment-success" *ngIf="paymentSuccess">
+      <h3>Payment Successful!</h3>
+      <p>Your order has been placed successfully. Redirecting to your orders...</p>
+    </div>
+  </div>
+</div><!doctype html>

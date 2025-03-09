@@ -6,10 +6,11 @@ import { RegisterComponent } from './components/register/register.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductFormComponent } from './admin/components/product-form/product-form.component';
 import { CategoryListComponent } from './components/category-list/category-list.component';
-import { CategoryFormComponent } from './admin/components/category-form/category-form.component'; // Import new component
+import { CategoryFormComponent } from './admin/components/category-form/category-form.component';
 import { OrderFormComponent } from './components/order-form/order-form.component';
 import { OrderListComponent } from './components/order-list/order-list.component';
 import { CartComponent } from './components/cart/cart.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
 
 // Export the routes so that they can be imported elsewhere.
 export const routes: Routes = [
@@ -22,9 +23,9 @@ export const routes: Routes = [
   { path: 'categories/new', component: CategoryFormComponent },
   { path: 'orders/new', component: OrderFormComponent },
   { path: 'cart', component: CartComponent },
+  { path: 'checkout/:id', component: CheckoutComponent },
   { path: 'orders', component: OrderListComponent },
   { path: 'admin', loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule) }
-
 ];
 
 @NgModule({

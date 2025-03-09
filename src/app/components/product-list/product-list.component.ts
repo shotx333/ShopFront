@@ -1,22 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService, Product } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
-import {  NgForOf, NgIf, NgOptimizedImage, NgClass } from '@angular/common';
+import { NgForOf, NgIf, NgOptimizedImage, NgClass } from '@angular/common';
 import { CategoryService, Category } from '../../services/category.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import baseUrl from '../../services/helper';
-import { FormsModule } from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 
 interface ProductWithQuantity extends Product {
   quantityToAdd?: number;
+  activeImageIndex?: number;
 }
 
 @Component({
   selector: 'app-product-list',
   imports: [
     NgIf,
-    NgOptimizedImage,
     NgForOf,
     NgClass,
     FormsModule
@@ -31,6 +31,10 @@ export class ProductListComponent implements OnInit {
   selectedCategoryId: number = 0; // 0 means all categories
   error: string = '';
 
+  // For full-size image modal
+  fullImageUrl: string | null = null;
+  fullImageAlt: string = '';
+
   constructor(
     private productService: ProductService,
     private cartService: CartService,
@@ -43,7 +47,7 @@ export class ProductListComponent implements OnInit {
   ngOnInit() {
     this.loadCategories();
     this.loadProducts();
-    
+
     // Subscribe to query params to filter by category
     this.route.queryParams.subscribe(params => {
       if (params['categoryId']) {
@@ -51,6 +55,12 @@ export class ProductListComponent implements OnInit {
         this.filterByCategory();
       }
     });
+  }
+
+  // Method to get category name by ID
+  getCategoryName(categoryId: number): string {
+    const category = this.categories.find(c => c.id === categoryId);
+    return category ? category.name : 'Unknown Category';
   }
 
   loadCategories() {
@@ -70,7 +80,8 @@ export class ProductListComponent implements OnInit {
       next: data => {
         this.products = data.map(product => ({
           ...product,
-          quantityToAdd: product.stock && product.stock > 0 ? 1 : 0
+          quantityToAdd: product.stock && product.stock > 0 ? 1 : 0,
+          activeImageIndex: 0
         }));
         this.filterByCategory();
         this.error = '';
@@ -96,7 +107,7 @@ export class ProductListComponent implements OnInit {
     if (!product.quantityToAdd || product.quantityToAdd < 1) {
       product.quantityToAdd = 1;
     }
-    
+
     // Ensure quantity doesn't exceed available stock
     if (product.stock !== undefined && product.quantityToAdd > product.stock) {
       product.quantityToAdd = product.stock;
@@ -105,18 +116,18 @@ export class ProductListComponent implements OnInit {
 
   addToCart(product: ProductWithQuantity) {
     const quantity = product.quantityToAdd || 1;
-    
+
     // Validate quantity against stock
     if (product.stock === undefined || product.stock < quantity) {
       alert('Not enough stock available');
       return;
     }
-    
+
     if (quantity < 1) {
       alert('Quantity must be at least 1');
       return;
     }
-    
+
     // Check if user is logged in
     if (!this.authService.isLoggedIn()) {
       if (confirm('Please log in to add items to your cart. Would you like to log in now?')) {
@@ -126,7 +137,7 @@ export class ProductListComponent implements OnInit {
       }
       return;
     }
-    
+
     // User is logged in, proceed with adding to cart
     this.cartService.addItem(product.id!, quantity).subscribe({
       next: () => {
@@ -138,9 +149,39 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  getCategoryName(categoryId: number): string {
-    const category = this.categories.find(c => c.id === categoryId);
-    return category ? category.name : '';
+  // Image carousel methods
+  getActiveImageIndex(product: ProductWithQuantity): number {
+    return product.activeImageIndex || 0;
+  }
+
+  setActiveImage(product: ProductWithQuantity, index: number): void {
+    product.activeImageIndex = index;
+  }
+
+  prevImage(product: ProductWithQuantity): void {
+    if (!product.images || product.images.length <= 1) return;
+
+    const currentIndex = product.activeImageIndex || 0;
+    const newIndex = currentIndex > 0 ? currentIndex - 1 : product.images.length - 1;
+    product.activeImageIndex = newIndex;
+  }
+
+  nextImage(product: ProductWithQuantity): void {
+    if (!product.images || product.images.length <= 1) return;
+
+    const currentIndex = product.activeImageIndex || 0;
+    const newIndex = currentIndex < product.images.length - 1 ? currentIndex + 1 : 0;
+    product.activeImageIndex = newIndex;
+  }
+
+  // Full image modal methods
+  openFullImage(imageUrl: string, altText: string): void {
+    this.fullImageUrl = imageUrl;
+    this.fullImageAlt = altText;
+  }
+
+  closeFullImage(): void {
+    this.fullImageUrl = null;
   }
 
   protected readonly baseUrl = baseUrl;

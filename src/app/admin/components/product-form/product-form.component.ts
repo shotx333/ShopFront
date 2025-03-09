@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ProductService, Product } from '../../../services/product.service';
+import { ProductService, Product, ProductImage } from '../../../services/product.service';
 import { CategoryService, Category } from '../../../services/category.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -9,13 +9,16 @@ import { TwoDecimalBlockDirective } from '../../../two-decimal-block.directive';
 @Component({
   selector: 'app-product-form',
   templateUrl: './product-form.component.html',
-  imports: [ReactiveFormsModule, CommonModule, TwoDecimalBlockDirective]
+  imports: [ReactiveFormsModule, CommonModule, TwoDecimalBlockDirective],
+  styleUrls: ['./product-form.component.scss']
 })
 export class ProductFormComponent implements OnInit {
   productForm: FormGroup;
   categories: Category[] = [];
-  selectedFile: File | null = null;
+  productImages: File[] = [];
+  primaryImageIndex: number = 0;
   error: string = '';
+  previewUrls: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -39,9 +42,38 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any) {
+  onFilesSelected(event: any) {
     if (event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
+      const files = event.target.files;
+
+      // Add the new files to our array
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        this.productImages.push(file);
+
+        // Create preview URLs
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.previewUrls.push(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+
+  setPrimaryImage(index: number) {
+    this.primaryImageIndex = index;
+  }
+
+  removeImage(index: number) {
+    this.productImages.splice(index, 1);
+    this.previewUrls.splice(index, 1);
+
+    // Adjust primary image index if needed
+    if (this.primaryImageIndex === index) {
+      this.primaryImageIndex = 0;
+    } else if (this.primaryImageIndex > index) {
+      this.primaryImageIndex--;
     }
   }
 
@@ -50,7 +82,13 @@ export class ProductFormComponent implements OnInit {
       this.error = 'Please fill all required fields correctly';
       return;
     }
-    
+
+    // Check if there's at least one image
+    if (this.productImages.length === 0) {
+      this.error = 'Please add at least one product image';
+      return;
+    }
+
     const formValue = this.productForm.value;
     const product: Product = {
       name: formValue.name,
@@ -59,20 +97,37 @@ export class ProductFormComponent implements OnInit {
       stock: Number(formValue.stock),
       category: { id: Number(formValue.categoryId), name: '' } // Only ID is needed
     };
-    
+
     this.productService.createProduct(product).subscribe({
       next: (createdProduct) => {
-        if (this.selectedFile) {
-          // After product creation, upload the image file.
-          this.productService.uploadImage(createdProduct.id!, this.selectedFile).subscribe({
-            next: () => this.router.navigate(['admin/products']),
-            error: () => this.error = 'Product created but image upload failed'
-          });
-        } else {
-          this.router.navigate(['admin/products']);
-        }
+        // Upload all images
+        this.uploadImages(createdProduct.id!, 0);
       },
       error: () => this.error = 'Error creating product'
+    });
+  }
+
+  // Recursive function to upload all images one by one
+  private uploadImages(productId: number, index: number) {
+    if (index >= this.productImages.length) {
+      // All images uploaded, navigate to product list
+      this.router.navigate(['admin/products']);
+      return;
+    }
+
+    const file = this.productImages[index];
+    const isPrimary = index === this.primaryImageIndex;
+
+    this.productService.addProductImage(productId, file, isPrimary).subscribe({
+      next: () => {
+        // Upload next image
+        this.uploadImages(productId, index + 1);
+      },
+      error: () => {
+        this.error = `Error uploading image ${index + 1}`;
+        // Continue with next image despite error
+        this.uploadImages(productId, index + 1);
+      }
     });
   }
 }

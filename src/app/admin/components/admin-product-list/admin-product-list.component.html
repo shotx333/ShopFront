@@ -9,7 +9,7 @@
     <th>Price</th>
     <th>Stock</th>
     <th>Category</th>
-    <th>Image</th>
+    <th>Images</th>
     <th>Actions</th>
   </tr>
   </thead>
@@ -19,14 +19,29 @@
     <td>{{ product.name }}</td>
     <td>{{ product.description }}</td>
     <td>{{ product.price }}</td>
-    <td [ngClass]="{'low-stock': product.stock !== undefined && product.stock < 5}">{{ product.stock }}</td>
+    <td [ngClass]="{'low-stock': product.stock < 5}">{{ product.stock }}</td>
     <td>{{ product.category?.name }}</td>
     <td>
-      <img *ngIf="product.imageUrl" ngSrc="{{baseUrl+product.imageUrl}}" alt="{{ product.name }}" width="100" height="100">
+      <div class="product-images">
+        <img *ngIf="product.imageUrl" [src]="baseUrl+product.imageUrl" alt="{{ product.name }}"
+             width="100" height="100" class="primary-image">
+
+        <div class="additional-images" *ngIf="product.images && product.images.length > 1">
+          <span>+{{ product.images.length - 1 }} more</span>
+
+          <div class="image-preview-popup">
+            <div *ngFor="let image of product.images" class="image-item">
+              <img [src]="baseUrl+image.imageUrl" alt="{{ product.name }}" width="50" height="50">
+              <span *ngIf="image.primary" class="primary-badge">Primary</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </td>
     <td>
       <button (click)="deleteProduct(product.id!)">Delete</button>
       <button (click)="openStockUpdateModal(product)">Update Stock</button>
+      <button (click)="manageProductImages(product)">Manage Images</button>
     </td>
   </tr>
   </tbody>
@@ -45,8 +60,40 @@
       </label>
       <div class="modal-actions">
         <button type="button" (click)="closeStockModal()">Cancel</button>
-        <button [disabled]="newStockValue < 0 || selectedProduct?.stock === undefined" type="submit">Update</button>
+        <button type="submit">Update</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Manage Images Modal -->
+<div *ngIf="showImagesModal" class="modal">
+  <div class="modal-content image-modal">
+    <h3>Manage Images for {{ selectedProduct?.name }}</h3>
+
+    <div class="images-container">
+      <div *ngFor="let image of selectedProduct?.images" class="product-image-item">
+        <img [src]="baseUrl+image.imageUrl" alt="{{ selectedProduct?.name }}">
+        <div class="image-actions">
+          <button *ngIf="!image.primary" (click)="setAsPrimaryImage(selectedProduct?.id!, image.id!)">Set as Primary</button>
+          <span *ngIf="image.primary" class="primary-badge">Primary Image</span>
+          <button (click)="deleteProductImage(selectedProduct?.id!, image.id!)">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="add-new-image">
+      <h4>Add New Image</h4>
+      <input type="file" #newImageInput accept="image/*">
+      <div class="checkbox-group">
+        <input type="checkbox" id="makePrimary" [(ngModel)]="makeNewImagePrimary">
+        <label for="makePrimary">Set as primary image</label>
+      </div>
+      <!-- Update this button in your admin-product-list.component.html -->
+      <button (click)="addNewImage(selectedProduct!.id!, newImageInput)">Upload Image</button>    </div>
+
+    <div class="modal-actions">
+      <button (click)="closeImagesModal()">Close</button>
+    </div>
   </div>
 </div>

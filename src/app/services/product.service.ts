@@ -7,6 +7,13 @@ export interface Category {
   name: string;
 }
 
+export interface ProductImage {
+  id?: number;
+  imageUrl: string;
+  primary?: boolean;
+  displayOrder?: number;
+}
+
 export interface Product {
   id?: number;
   name: string;
@@ -15,6 +22,7 @@ export interface Product {
   stock?: number;
   category: Category;
   imageUrl?: string;
+  images?: ProductImage[];
 }
 
 @Injectable({
@@ -45,10 +53,33 @@ export class ProductService {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 
-  // Upload an image for a product
+  // Upload a primary image for a product (legacy method)
   uploadImage(productId: number, file: File): Observable<Product> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<Product>(`${this.baseUrl}/${productId}/upload-image`, formData);
+  }
+
+  // Add an additional image to a product
+  addProductImage(productId: number, file: File, isPrimary: boolean = false): Observable<Product> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('primary', isPrimary.toString());
+    return this.http.post<Product>(`${this.baseUrl}/${productId}/images`, formData);
+  }
+
+  // Delete a product image
+  deleteProductImage(productId: number, imageId: number): Observable<Product> {
+    return this.http.delete<Product>(`${this.baseUrl}/${productId}/images/${imageId}`);
+  }
+
+  // Set an image as the primary product image
+  setPrimaryProductImage(productId: number, imageId: number): Observable<Product> {
+    return this.http.put<Product>(`${this.baseUrl}/${productId}/images/${imageId}/primary`, {});
+  }
+
+  // Reorder product images
+  reorderProductImages(productId: number, imageIds: number[]): Observable<Product> {
+    return this.http.put<Product>(`${this.baseUrl}/${productId}/images/reorder`, imageIds);
   }
 }
