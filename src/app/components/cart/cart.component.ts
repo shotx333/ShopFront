@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService, Product } from '../../services/product.service';
 import { forkJoin } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-cart',
@@ -17,12 +18,14 @@ export class CartComponent implements OnInit {
   cart: Cart | null = null;
   products: Map<number, Product> = new Map();
   error: string = '';
+  showLoginPrompt: boolean = false;
 
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -30,6 +33,11 @@ export class CartComponent implements OnInit {
   }
 
   loadCart() {
+    if (!this.authService.isLoggedIn()) {
+      this.showLoginPrompt = true;
+
+      return;
+    }
     this.cartService.fetchCart().subscribe({
       next: (cart) => {
         this.cart = cart;
@@ -67,17 +75,23 @@ export class CartComponent implements OnInit {
     return product ? product.price : 0;
   }
 
-  getItemSubtotal(item: CartItem): number {
+  getItemSubtotal(item: CartItem): string {
     const price = this.getProductPrice(item.productId);
-    return price * item.quantity;
+    const subtotal = price * item.quantity;
+    // Format to 2 decimal places
+    return subtotal.toFixed(2);
   }
 
-  getCartTotal(): number {
-    if (!this.cart) return 0;
+  getCartTotal(): string {
+    if (!this.cart) return '0.00';
 
-    return this.cart.items.reduce((total, item) =>
-      total + this.getItemSubtotal(item), 0
-    );
+    const total = this.cart.items.reduce((total, item) => {
+      const price = this.getProductPrice(item.productId);
+      return total + (price * item.quantity);
+    }, 0);
+    
+    // Format to 2 decimal places
+    return total.toFixed(2);
   }
 
   hasStockIssues(): boolean {

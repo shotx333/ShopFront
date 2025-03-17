@@ -9,8 +9,9 @@ import { TwoDecimalBlockDirective } from '../../../two-decimal-block.directive';
 @Component({
   selector: 'app-product-form',
   templateUrl: './product-form.component.html',
-  imports: [ReactiveFormsModule, CommonModule, TwoDecimalBlockDirective],
-  styleUrls: ['./product-form.component.scss']
+  styleUrls: ['./product-form.component.scss'],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule, TwoDecimalBlockDirective]
 })
 export class ProductFormComponent implements OnInit {
   productForm: FormGroup;

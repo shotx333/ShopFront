@@ -1,4 +1,7 @@
 <h2>Your Cart</h2>
+<div *ngIf="showLoginPrompt" class="login-prompt">
+  <p>Please log in or register to add items to your cart.</p>
+</div>
 <div *ngIf="error" style="color: red;">{{ error }}</div>
 <table *ngIf="cart && cart.items.length">
   <thead>
@@ -20,7 +23,7 @@
           </div>
         </ng-container>
       </td>
-      <td>{{ getProductPrice(item.productId) }}</td>
+      <td>{{ getProductPrice(item.productId).toFixed(2) }}</td>
       <td>
         <input type="number" min="1" [(ngModel)]="item.quantity" (change)="validateQuantity(item)">
         <button (click)="updateItem(item.productId, item.quantity)">Update</button>

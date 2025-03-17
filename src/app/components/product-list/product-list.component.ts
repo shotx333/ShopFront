@@ -6,7 +6,7 @@ import { CategoryService, Category } from '../../services/category.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import baseUrl from '../../services/helper';
-import {FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 interface ProductWithQuantity extends Product {
   quantityToAdd?: number;
@@ -28,7 +28,7 @@ export class ProductListComponent implements OnInit {
   products: ProductWithQuantity[] = [];
   filteredProducts: ProductWithQuantity[] = [];
   categories: Category[] = [];
-  selectedCategoryId: number = 0; // 0 means all categories
+  selectedCategories: number[] = [];
   error: string = '';
 
   // For full-size image modal
@@ -51,16 +51,23 @@ export class ProductListComponent implements OnInit {
     // Subscribe to query params to filter by category
     this.route.queryParams.subscribe(params => {
       if (params['categoryId']) {
-        this.selectedCategoryId = Number(params['categoryId']);
-        this.filterByCategory();
+        const categoryId = Number(params['categoryId']);
+        // If categoryId is 0, clear selection, otherwise select just that category
+        if (categoryId === 0) {
+          this.selectedCategories = [];
+        } else {
+          this.selectedCategories = [categoryId];
+        }
+        this.filterProducts();
       }
     });
-  }
-
-  // Method to get category name by ID
-  getCategoryName(categoryId: number): string {
-    const category = this.categories.find(c => c.id === categoryId);
-    return category ? category.name : 'Unknown Category';
+    
+    // Subscribe to router events to refresh data when navigating to this component
+    this.router.events.subscribe(() => {
+      if (this.router.url.includes('/products')) {
+        this.loadProducts();
+      }
+    });
   }
 
   loadCategories() {
@@ -69,7 +76,6 @@ export class ProductListComponent implements OnInit {
         this.categories = data;
       },
       error: () => {
-        // Just log the error but don't show it to user
         console.error('Error fetching categories');
       }
     });
@@ -78,12 +84,23 @@ export class ProductListComponent implements OnInit {
   loadProducts() {
     this.productService.getProducts().subscribe({
       next: data => {
-        this.products = data.map(product => ({
-          ...product,
-          quantityToAdd: product.stock && product.stock > 0 ? 1 : 0,
-          activeImageIndex: 0
-        }));
-        this.filterByCategory();
+        this.products = data.map(product => {
+          // Find the primary image index to set as active by default
+          let primaryIndex = 0;
+          if (product.images && product.images.length > 0) {
+            const primaryImageIndex = product.images.findIndex(img => img.primary);
+            if (primaryImageIndex >= 0) {
+              primaryIndex = primaryImageIndex;
+            }
+          }
+          
+          return {
+            ...product,
+            quantityToAdd: product.stock && product.stock > 0 ? 1 : 0,
+            activeImageIndex: primaryIndex
+          };
+        });
+        this.filterProducts();
         this.error = '';
       },
       error: (err) => {
@@ -93,12 +110,60 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  filterByCategory() {
-    if (this.selectedCategoryId === 0) {
+  // Category selection methods
+  isAllCategoriesSelected(): boolean {
+    return this.selectedCategories.length === 0; // No filters means all categories
+  }
+
+  isCategorySelected(categoryId: number): boolean {
+    return this.selectedCategories.includes(categoryId);
+  }
+
+  toggleAllCategories(): void {
+    if (this.isAllCategoriesSelected()) {
+      // If all categories are already selected, select none
+      this.selectedCategories = this.categories.map(c => c.id!);
+    } else {
+      // Otherwise clear selection to show all
+      this.selectedCategories = [];
+    }
+    this.filterProducts();
+  }
+
+  toggleCategory(categoryId: number): void {
+    if (this.isCategorySelected(categoryId)) {
+      // Remove from selection
+      this.selectedCategories = this.selectedCategories.filter(id => id !== categoryId);
+    } else {
+      // Add to selection
+      this.selectedCategories.push(categoryId);
+    }
+    this.filterProducts();
+  }
+
+  clearFilters(): void {
+    this.selectedCategories = [];
+    this.filterProducts();
+  }
+
+  getSelectedCategoriesString(): string {
+    return this.selectedCategories
+      .map(categoryId => {
+        const category = this.categories.find(c => c.id === categoryId);
+        return category ? category.name : '';
+      })
+      .filter(name => name)
+      .join(', ');
+  }
+
+  filterProducts(): void {
+    if (this.selectedCategories.length === 0) {
+      // No filters, show all products
       this.filteredProducts = [...this.products];
     } else {
+      // Filter by selected categories
       this.filteredProducts = this.products.filter(
-        product => product.category?.id === this.selectedCategoryId
+        product => product.category && this.selectedCategories.includes(product.category.id!)
       );
     }
   }
@@ -174,10 +239,14 @@ export class ProductListComponent implements OnInit {
     product.activeImageIndex = newIndex;
   }
 
-  // Full image modal methods
-  openFullImage(imageUrl: string, altText: string): void {
-    this.fullImageUrl = imageUrl;
-    this.fullImageAlt = altText;
+  // Updated Full image modal methods to use the correct image
+  openFullImage(product: ProductWithQuantity, imageIndex: number): void {
+    if (product.images && product.images.length > 0) {
+      // Use the specific image that was clicked
+      const imageUrl = baseUrl + product.images[imageIndex].imageUrl;
+      this.fullImageUrl = imageUrl;
+      this.fullImageAlt = product.name;
+    }
   }
 
   closeFullImage(): void {

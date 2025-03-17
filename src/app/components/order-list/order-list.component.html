@@ -1,11 +1,13 @@
 <h2>Your Orders</h2>
 <div *ngIf="error">{{ error }}</div>
 <div *ngFor="let order of orders">
-  <h3>Order #{{ order.id }} - Total: {{ order.totalPrice }}</h3>
+  <h3>Order #{{ order.id }} - Total: ${{ formatTotalPrice(order.totalPrice) }}</h3>
   <p>Created At: {{ order.createdAt }}</p>
   <ul>
     <li *ngFor="let item of order.items">
-      Product ID: {{ item.productId }}, Quantity: {{ item.quantity }}, Price: {{ item.price }}
+      Product ID: {{ item.productId }}, Quantity: {{ item.quantity }}, Price: ${{ formatPrice(item.price) }}
+      <br>
+      Subtotal: ${{ calculateItemTotal(item) }}
     </li>
   </ul>
   <hr>

@@ -19,7 +19,7 @@
     <td>{{ product.name }}</td>
     <td>{{ product.description }}</td>
     <td>{{ product.price }}</td>
-    <td [ngClass]="{'low-stock': product.stock < 5}">{{ product.stock }}</td>
+    <td [ngClass]="{'low-stock': product.stock !== undefined && product.stock < 5}">{{ product.stock }}</td>
     <td>{{ product.category?.name }}</td>
     <td>
       <div class="product-images">

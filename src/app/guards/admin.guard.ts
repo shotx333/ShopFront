@@ -3,12 +3,13 @@ import { CanActivate, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import baseUrl from '../services/helper';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminGuard implements CanActivate {
-  private adminCheckUrl = 'http://localhost:8080/auth/admin-check';
+  private adminCheckUrl = `${baseUrl}/auth/admin-check`;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -25,4 +26,6 @@ export class AdminGuard implements CanActivate {
       })
     );
   }
+  protected readonly baseUrl = baseUrl;
+
 }

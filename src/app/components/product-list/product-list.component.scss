@@ -1,4 +1,100 @@
-ul {
+.product-page-container {
+  display: flex;
+  gap: 20px;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* Category Sidebar Styles */
+.category-sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  padding: 15px;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.category-header {
+  margin-bottom: 15px;
+  
+  h3 {
+    font-size: 18px;
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+}
+
+.category-filters {
+  .category-item {
+    margin: 10px 0;
+    
+    label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      
+      input[type="checkbox"] {
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
+/* Product List Content */
+.product-content {
+  flex-grow: 1;
+}
+
+.filter-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  background-color: #f0f7ff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .clear-filter-btn {
+    background-color: #e7f1fd;
+    border: 1px solid #b6d4fd;
+    color: #0066cc;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: #d5e7fc;
+    }
+  }
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fde8e7;
+  border-radius: 4px;
+}
+
+.no-products-message {
+  margin: 30px 0;
+  padding: 20px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  color: #666;
+}
+
+/* Product Grid */
+.product-grid {
   list-style: none;
   padding: 0;
   display: grid;
@@ -140,15 +236,6 @@ ul {
   }
 }
 
-.category-info {
-  margin-bottom: 20px;
-
-  h3 {
-    color: #333;
-    font-weight: 500;
-  }
-}
-
 .image-modal {
   display: flex;
   position: fixed;
@@ -181,5 +268,16 @@ ul {
       font-size: 30px;
       cursor: pointer;
     }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .product-page-container {
+    flex-direction: column;
+  }
+  
+  .category-sidebar {
+    width: 100%;
   }
 }

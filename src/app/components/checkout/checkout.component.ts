@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrderService, Order } from '../../services/order.service';
+import { OrderService, Order, OrderItem } from '../../services/order.service';
 import { StripeService } from '../../services/stripe.service';
+import { formatPrice, calculateItemTotal, formatTotalPrice } from '../../services/helper';
 
 declare var Stripe: any;
 
@@ -171,4 +172,8 @@ export class CheckoutComponent implements OnInit {
   cancelPayment() {
     this.router.navigate(['/cart']);
   }
+
+  protected readonly formatPrice = formatPrice;
+  protected readonly calculateItemTotal = calculateItemTotal;
+  protected readonly formatTotalPrice = formatTotalPrice;
 }

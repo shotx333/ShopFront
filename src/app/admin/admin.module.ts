@@ -1,15 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminRoutingModule } from './admin-routing.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { AdminProductListComponent } from './components/admin-product-list/admin-product-list.component';
 import { AdminCategoryListComponent } from './components/admin-category-list/admin-category-list.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ProductFormComponent } from './components/product-form/product-form.component';
+import { CategoryFormComponent } from './components/category-form/category-form.component';
 
 @NgModule({
-  declarations: [
-
-  ],
   imports: [
     CommonModule,
     AdminRoutingModule,
@@ -17,7 +16,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ReactiveFormsModule,
     AdminDashboardComponent,
     AdminProductListComponent,
-    AdminCategoryListComponent
+    AdminCategoryListComponent,
+    ProductFormComponent,
+    CategoryFormComponent
   ]
 })
 export class AdminModule { }
