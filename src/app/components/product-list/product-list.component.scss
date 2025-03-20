@@ -116,27 +116,24 @@
       overflow: hidden;
       border-radius: 4px;
 
-      .carousel-inner {
+      .carousel-inner img {
         width: 100%;
         height: 100%;
-        position: relative;
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          position: absolute;
-          top: 0;
-          left: 0;
-          opacity: 0;
-          transition: opacity 0.5s ease;
-          cursor: pointer;
-
-          &.active {
-            opacity: 1;
-          }
-        }
+        object-fit: contain;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        cursor: pointer;
+        pointer-events: none; // Disable clicks for inactive images
       }
+      
+      .carousel-inner img.active {
+        opacity: 1;
+        pointer-events: auto; // Enable clicks only for the active image
+      }
+      
 
       .carousel-indicators {
         position: absolute;
