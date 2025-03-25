@@ -4,15 +4,35 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { AdminProductListComponent } from './components/admin-product-list/admin-product-list.component';
 import { AdminCategoryListComponent } from './components/admin-category-list/admin-category-list.component';
 import { AdminGuard } from '../guards/admin.guard';
-import {ProductFormComponent} from './components/product-form/product-form.component';
-import {CategoryFormComponent} from './components/category-form/category-form.component';
+import { ProductFormComponent } from './components/product-form/product-form.component';
+import { CategoryFormComponent } from './components/category-form/category-form.component';
 
 const routes: Routes = [
-  { path: '', component: AdminDashboardComponent, canActivate: [AdminGuard] },
-  { path: 'products', component: AdminProductListComponent, canActivate: [AdminGuard] },
-  { path: 'products/new', component: ProductFormComponent, canActivate: [AdminGuard] },
-  { path: 'categories', component: AdminCategoryListComponent, canActivate: [AdminGuard] },
-  { path: 'categories/new', component: CategoryFormComponent, canActivate: [AdminGuard] }
+  { 
+    path: '', 
+    component: AdminDashboardComponent, 
+    canActivate: [AdminGuard] 
+  },
+  { 
+    path: 'products', 
+    component: AdminProductListComponent, 
+    canActivate: [AdminGuard] 
+  },
+  { 
+    path: 'products/new', 
+    component: ProductFormComponent, 
+    canActivate: [AdminGuard] 
+  },
+  { 
+    path: 'categories', 
+    component: AdminCategoryListComponent, 
+    canActivate: [AdminGuard] 
+  },
+  { 
+    path: 'categories/new', 
+    component: CategoryFormComponent, 
+    canActivate: [AdminGuard] 
+  }
 ];
 
 @NgModule({

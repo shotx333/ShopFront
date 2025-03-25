@@ -4,7 +4,10 @@ import { CartService } from '../../services/cart.service';
 import { NgForOf, NgIf, NgOptimizedImage, NgClass } from '@angular/common';
 import { CategoryService, Category } from '../../services/category.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+// Removed AuthService import
+// Added isLoggedIn property
+
+
 import baseUrl from '../../services/helper';
 import { FormsModule } from '@angular/forms';
 
@@ -26,6 +29,8 @@ interface ProductWithQuantity extends Product {
 })
 export class ProductListComponent implements OnInit {
   products: ProductWithQuantity[] = [];
+  isLoggedIn: boolean = false; // Default value for login status
+
   filteredProducts: ProductWithQuantity[] = [];
   categories: Category[] = [];
   selectedCategories: number[] = [];
@@ -41,7 +46,8 @@ export class ProductListComponent implements OnInit {
     private categoryService: CategoryService,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
+    // Removed AuthService from constructor
+
   ) { }
 
   ngOnInit() {
@@ -193,18 +199,20 @@ export class ProductListComponent implements OnInit {
       return;
     }
 
-    // Check if user is logged in
-    if (!this.authService.isLoggedIn()) {
-      if (confirm('Please log in to add items to your cart. Would you like to log in now?')) {
-        // Save current URL to redirect back after login
-        localStorage.setItem('redirectUrl', this.router.url);
-        this.router.navigate(['/login']);
-      }
-      return;
-    }
+    // Check login status from local storage or another method
+    this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; // Example check
+
+
 
     // User is logged in, proceed with adding to cart
+    // Validate if user is logged in before adding to cart
+    if (!this.isLoggedIn) {
+      alert('Please log in to add items to your cart.');
+      return;
+    }
     this.cartService.addItem(product.id!, quantity).subscribe({
+
+
       next: () => {
         alert(`${quantity} ${product.name}(s) added to cart.`);
         // Reload products to get updated stock information

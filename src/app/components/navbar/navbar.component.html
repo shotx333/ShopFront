@@ -16,10 +16,10 @@
   
   <a routerLink="/cart">Cart</a> |
   <a routerLink="/orders">Orders</a> |
-  <span *ngIf="authService.isLoggedIn()">
+  <span *ngIf="isLoggedIn">
     <button (click)="logout()">Logout</button>
   </span>
-  <span *ngIf="!authService.isLoggedIn()">
+  <span *ngIf="!isLoggedIn">
     <a routerLink="/login">Login</a> |
     <a routerLink="/register">Register</a>
   </span>

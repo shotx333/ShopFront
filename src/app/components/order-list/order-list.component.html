@@ -1,4 +1,7 @@
 <h2>Your Orders</h2>
+<div *ngIf="showLoginPrompt" class="login-prompt">
+  <p>Please log in to view your orders.</p>
+</div>
 <div *ngIf="error">{{ error }}</div>
 <div *ngFor="let order of orders">
   <h3>Order #{{ order.id }} - Total: ${{ formatTotalPrice(order.totalPrice) }}</h3>
