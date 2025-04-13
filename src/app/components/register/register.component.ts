@@ -17,16 +17,13 @@ export class RegisterComponent {
     this.registerForm = this.fb.group({
       username: [''],
       password: [''],
-      // role: ['USER'] // default role
     });
   }
 
 register() {
   const { username, password } = this.registerForm.value;
-  // this.authService.register(username, password, role).subscribe({
   this.authService.register(username, password).subscribe({
     next: () => {
-      // After successful registration, immediately log the user in.
       this.authService.login(username, password).subscribe({
         next: () => this.router.navigate(['/']),
         error: () => this.error = 'Login failed after registration'

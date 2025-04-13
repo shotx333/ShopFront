@@ -20,10 +20,10 @@ export class AuthService {
     private router: Router,
     private authEventService: AuthEventService
   ) {
-    // Check token validity on service initialization
+    
     this.checkTokenValidity();
     
-    // Subscribe to auth error events
+    
     this.authEventService.authError$.subscribe(() => {
       if (this.isLoggedIn()) {
         console.log('Auth error received, logging out');
@@ -40,7 +40,7 @@ export class AuthService {
     ).pipe(
       tap(token => {
         localStorage.setItem(this.tokenKey, token);
-        // Assume token expires in 1 hour (3600 seconds)
+        
         this.setLogoutTimer(3600 * 1000);
         this.authStatus.next(true);
       })
@@ -55,7 +55,7 @@ export class AuthService {
     ).pipe(
       tap(token => {
         localStorage.setItem(this.tokenKey, token);
-        // Assume token expires in 1 hour (3600 seconds)
+        
         this.setLogoutTimer(3600 * 1000);
         this.authStatus.next(true);
       })
@@ -67,10 +67,10 @@ export class AuthService {
       clearTimeout(this.tokenExpirationTimer);
     }
     
-    // Only attempt to call logout API if we have a token
+    
     const token = this.getToken();
     if (token) {
-      // Attempt to logout on server but don't wait for response
+      
       this.http.post(`${baseUrl}/auth/logout`, {}, {
         headers: new HttpHeaders({
           'Authorization': token
@@ -85,7 +85,7 @@ export class AuthService {
     this.currentUserRole.next(null);
     this.authStatus.next(false);
     
-    // Redirect to login
+    
     this.router.navigate(['/login']);
   }
 
@@ -104,17 +104,17 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  // Check if the token is still valid by making a test request
+  
   checkTokenValidity(): void {
     if (!this.isLoggedIn()) {
       this.authStatus.next(false);
       return;
     }
 
-    // Make a request to a simple endpoint to verify token
+    
     this.http.get(`${baseUrl}/auth/admin-check`, { observe: 'response' }).pipe(
       catchError(error => {
-        // If 401 or 403, token is invalid or expired
+        
         if (error.status === 401 || error.status === 403) {
           console.log('Token is invalid or expired, logging out');
           this.logout();

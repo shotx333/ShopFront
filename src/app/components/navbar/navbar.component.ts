@@ -1,45 +1,65 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-// Removed AuthService import
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Category, CategoryService } from '../../services/category.service';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
-  imports: [CommonModule, RouterLink]
+  imports: [CommonModule, RouterLink, FormsModule],
+  standalone: true
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   categories: Category[] = [];
   isLoggedIn: boolean = false;
   private authStatusSubscription: Subscription | null = null;
+  private routerSubscription: Subscription | null = null;
+  
+  searchQuery: string = '';
+  private lastSearchQuery: string = '';
 
   constructor(
-    // Removed AuthService from constructor
     private authService: AuthService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadCategories();
     
-    // Subscribe to auth status changes
-    // Implement a different approach to manage authentication status
     this.authStatusSubscription = this.authService.authStatus.subscribe(status => {
       this.isLoggedIn = status;
     });
     this.isLoggedIn = this.authService.isLoggedIn();
-
+    
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryParam = urlParams.get('query');
+        
+        if (queryParam) {
+          this.searchQuery = queryParam;
+          this.lastSearchQuery = queryParam;
+        } else if (!window.location.pathname.includes('/products')) {
+          this.searchQuery = '';
+          this.lastSearchQuery = '';
+        }
+      });
   }
 
   ngOnDestroy(): void {
-    // Clean up subscription when component is destroyed
     if (this.authStatusSubscription) {
       this.authStatusSubscription.unsubscribe();
+    }
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
     }
   }
 
@@ -51,7 +71,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    // Implement logout functionality without AuthService
     this.authService.logout();
+  }
+  
+  search(): void {
+    const trimmedQuery = this.searchQuery.trim();
+    
+    if (trimmedQuery === this.lastSearchQuery || trimmedQuery === '') {
+      return;
+    }
+    
+    this.lastSearchQuery = trimmedQuery;
+    
+    this.router.navigate(['/products'], { 
+      queryParams: { query: trimmedQuery }
+    });
   }
 }

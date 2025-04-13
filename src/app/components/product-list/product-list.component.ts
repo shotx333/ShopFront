@@ -1,15 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProductService, Product } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
-import { NgForOf, NgIf, NgOptimizedImage, NgClass } from '@angular/common';
+import { NgForOf, NgIf, NgClass, CommonModule } from '@angular/common';
 import { CategoryService, Category } from '../../services/category.service';
-import { ActivatedRoute, Router } from '@angular/router';
-// Removed AuthService import
-// Added isLoggedIn property
-
-
+import { ActivatedRoute, Router, NavigationEnd, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import baseUrl from '../../services/helper';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 interface ProductWithQuantity extends Product {
   quantityToAdd?: number;
@@ -22,21 +20,30 @@ interface ProductWithQuantity extends Product {
     NgIf,
     NgForOf,
     NgClass,
-    FormsModule
+    FormsModule,
+    RouterLink
   ],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss']
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, OnDestroy {
   products: ProductWithQuantity[] = [];
-  isLoggedIn: boolean = false; // Default value for login status
+  isLoggedIn: boolean = false;
 
   filteredProducts: ProductWithQuantity[] = [];
   categories: Category[] = [];
   selectedCategories: number[] = [];
   error: string = '';
 
-  // For full-size image modal
+  searchQuery: string = '';
+  searchActive: boolean = false;
+  
+  private lastSearchQuery: string = '';
+  protected isSearching: boolean = false;
+  
+  private routerSubscription: Subscription | null = null;
+  private queryParamSubscription: Subscription | null = null;
+
   fullImageUrl: string | null = null;
   fullImageAlt: string = '';
 
@@ -46,34 +53,63 @@ export class ProductListComponent implements OnInit {
     private categoryService: CategoryService,
     private route: ActivatedRoute,
     private router: Router,
-    // Removed AuthService from constructor
-
   ) { }
 
   ngOnInit() {
     this.loadCategories();
-    this.loadProducts();
-
-    // Subscribe to query params to filter by category
-    this.route.queryParams.subscribe(params => {
+    
+    this.queryParamSubscription = this.route.queryParams.subscribe(params => {
+      let needsDataRefresh = false;
+      
       if (params['categoryId']) {
         const categoryId = Number(params['categoryId']);
-        // If categoryId is 0, clear selection, otherwise select just that category
         if (categoryId === 0) {
           this.selectedCategories = [];
         } else {
           this.selectedCategories = [categoryId];
         }
-        this.filterProducts();
+        needsDataRefresh = true;
+      }
+      
+      if (params['query'] && params['query'] !== this.lastSearchQuery) {
+        this.searchQuery = params['query'];
+        this.lastSearchQuery = params['query'];
+        this.searchActive = true;
+        needsDataRefresh = true;
+      }
+      
+      if (needsDataRefresh) {
+        if (this.searchActive) {
+          this.searchProducts(false);
+        } else {
+          this.loadProducts();
+        }
       }
     });
     
-    // Subscribe to router events to refresh data when navigating to this component
-    this.router.events.subscribe(() => {
-      if (this.router.url.includes('/products')) {
-        this.loadProducts();
-      }
-    });
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        if (this.router.url.includes('/products') && !this.router.url.includes('?')) {
+          this.searchQuery = '';
+          this.lastSearchQuery = '';
+          this.searchActive = false;
+          this.loadProducts();
+        }
+      });
+      
+    if (!this.searchActive) {
+      this.loadProducts();
+    }
+  }
+  
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+    if (this.queryParamSubscription) {
+      this.queryParamSubscription.unsubscribe();
+    }
   }
 
   loadCategories() {
@@ -88,10 +124,11 @@ export class ProductListComponent implements OnInit {
   }
 
   loadProducts() {
+    if (this.isSearching) return;
+    
     this.productService.getProducts().subscribe({
       next: data => {
         this.products = data.map(product => {
-          // Find the primary image index to set as active by default
           let primaryIndex = 0;
           if (product.images && product.images.length > 0) {
             const primaryImageIndex = product.images.findIndex(img => img.primary);
@@ -116,9 +153,87 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  // Category selection methods
+  searchProducts(updateUrl: boolean = true) {
+    if (this.isSearching || (this.searchQuery === this.lastSearchQuery && this.searchActive)) {
+      return;
+    }
+    
+    if (!this.searchQuery || this.searchQuery.trim() === '') {
+      this.searchActive = false;
+      this.lastSearchQuery = '';
+      this.loadProducts();
+      
+      if (updateUrl) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { query: null },
+          queryParamsHandling: 'merge'
+        });
+      }
+      return;
+    }
+    
+    this.searchActive = true;
+    this.isSearching = true;
+    this.lastSearchQuery = this.searchQuery;
+    
+    const categoryIds = this.selectedCategories.length > 0 ? this.selectedCategories : undefined;
+    
+    this.productService.searchProducts(this.searchQuery, categoryIds).subscribe({
+      next: data => {
+        if (updateUrl) {
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { query: this.searchQuery },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+          });
+        }
+        
+        this.products = data.map(product => {
+          let primaryIndex = 0;
+          if (product.images && product.images.length > 0) {
+            const primaryImageIndex = product.images.findIndex(img => img.primary);
+            if (primaryImageIndex >= 0) {
+              primaryIndex = primaryImageIndex;
+            }
+          }
+          
+          return {
+            ...product,
+            quantityToAdd: product.stock && product.stock > 0 ? 1 : 0,
+            activeImageIndex: primaryIndex
+          };
+        });
+        
+        this.filterProducts();
+        this.error = '';
+        this.isSearching = false;
+      },
+      error: (err) => {
+        console.error('Error searching products', err);
+        this.error = 'Error searching products. Please try again later.';
+        this.isSearching = false;
+      }
+    });
+  }
+
+  clearSearch() {
+    this.searchQuery = '';
+    this.lastSearchQuery = '';
+    this.searchActive = false;
+    
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { query: null },
+      queryParamsHandling: 'merge'
+    });
+    
+    this.loadProducts();
+  }
+
   isAllCategoriesSelected(): boolean {
-    return this.selectedCategories.length === 0; // No filters means all categories
+    return this.selectedCategories.length === 0;
   }
 
   isCategorySelected(categoryId: number): boolean {
@@ -127,29 +242,37 @@ export class ProductListComponent implements OnInit {
 
   toggleAllCategories(): void {
     if (this.isAllCategoriesSelected()) {
-      // If all categories are already selected, select none
       this.selectedCategories = this.categories.map(c => c.id!);
     } else {
-      // Otherwise clear selection to show all
       this.selectedCategories = [];
     }
     this.filterProducts();
+    
+    if (this.searchActive) {
+      this.searchProducts();
+    }
   }
 
   toggleCategory(categoryId: number): void {
     if (this.isCategorySelected(categoryId)) {
-      // Remove from selection
       this.selectedCategories = this.selectedCategories.filter(id => id !== categoryId);
     } else {
-      // Add to selection
       this.selectedCategories.push(categoryId);
     }
     this.filterProducts();
+    
+    if (this.searchActive) {
+      this.searchProducts();
+    }
   }
 
   clearFilters(): void {
     this.selectedCategories = [];
     this.filterProducts();
+    
+    if (this.searchActive) {
+      this.searchProducts();
+    }
   }
 
   getSelectedCategoriesString(): string {
@@ -164,10 +287,8 @@ export class ProductListComponent implements OnInit {
 
   filterProducts(): void {
     if (this.selectedCategories.length === 0) {
-      // No filters, show all products
       this.filteredProducts = [...this.products];
     } else {
-      // Filter by selected categories
       this.filteredProducts = this.products.filter(
         product => product.category && this.selectedCategories.includes(product.category.id!)
       );
@@ -179,7 +300,6 @@ export class ProductListComponent implements OnInit {
       product.quantityToAdd = 1;
     }
 
-    // Ensure quantity doesn't exceed available stock
     if (product.stock !== undefined && product.quantityToAdd > product.stock) {
       product.quantityToAdd = product.stock;
     }
@@ -188,7 +308,6 @@ export class ProductListComponent implements OnInit {
   addToCart(product: ProductWithQuantity) {
     const quantity = product.quantityToAdd || 1;
 
-    // Validate quantity against stock
     if (product.stock === undefined || product.stock < quantity) {
       alert('Not enough stock available');
       return;
@@ -199,30 +318,22 @@ export class ProductListComponent implements OnInit {
       return;
     }
 
-    // Check login status from local storage or another method
-    this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; // Example check
+    this.isLoggedIn = localStorage.getItem('authToken') !== null;
 
-
-
-    // User is logged in, proceed with adding to cart
-    // Validate if user is logged in before adding to cart
     if (!this.isLoggedIn) {
       alert('Please log in to add items to your cart.');
       return;
     }
+    
     this.cartService.addItem(product.id!, quantity).subscribe({
-
-
       next: () => {
         alert(`${quantity} ${product.name}(s) added to cart.`);
-        // Reload products to get updated stock information
         this.loadProducts();
       },
       error: (err) => alert(err.error || 'Error adding product to cart.')
     });
   }
 
-  // Image carousel methods
   getActiveImageIndex(product: ProductWithQuantity): number {
     return product.activeImageIndex || 0;
   }
@@ -247,10 +358,8 @@ export class ProductListComponent implements OnInit {
     product.activeImageIndex = newIndex;
   }
 
-  // Updated Full image modal methods to use the correct image
   openFullImage(product: ProductWithQuantity, imageIndex: number): void {
     if (product.images && product.images.length > 0) {
-      // Use the specific image that was clicked
       const imageUrl = baseUrl + product.images[imageIndex].imageUrl;
       this.fullImageUrl = imageUrl;
       this.fullImageAlt = product.name;

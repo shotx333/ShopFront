@@ -67,7 +67,6 @@ export class AdminProductListComponent {
   updateStock(): void {
     if (!this.selectedProduct) return;
 
-    // Create a copy of the product with updated stock
     const updatedProduct: Product = {
       ...this.selectedProduct,
       stock: this.newStockValue
@@ -99,10 +98,8 @@ export class AdminProductListComponent {
   setAsPrimaryImage(productId: number, imageId: number): void {
     this.productService.setPrimaryProductImage(productId, imageId).subscribe({
       next: (updatedProduct) => {
-        // Update the selected product with the new data
         this.selectedProduct = updatedProduct;
 
-        // Also update the product in the main list
         const index = this.products.findIndex(p => p.id === productId);
         if (index !== -1) {
           this.products[index] = updatedProduct;
@@ -118,10 +115,8 @@ export class AdminProductListComponent {
     if (confirm('Are you sure you want to delete this image?')) {
       this.productService.deleteProductImage(productId, imageId).subscribe({
         next: (updatedProduct) => {
-          // Update the selected product with the new data
           this.selectedProduct = updatedProduct;
 
-          // Also update the product in the main list
           const index = this.products.findIndex(p => p.id === productId);
           if (index !== -1) {
             this.products[index] = updatedProduct;
@@ -134,7 +129,6 @@ export class AdminProductListComponent {
     }
   }
 
-// Update this method in AdminProductListComponent.ts
   addNewImage(productId: number, fileInput: HTMLInputElement): void {
     if (!fileInput.files || fileInput.files.length === 0) {
       alert('Please select an image file to upload');
@@ -145,16 +139,13 @@ export class AdminProductListComponent {
 
     this.productService.addProductImage(productId, file, this.makeNewImagePrimary).subscribe({
       next: (updatedProduct) => {
-        // Update the selected product with the new data
         this.selectedProduct = updatedProduct;
 
-        // Also update the product in the main list
         const index = this.products.findIndex(p => p.id === productId);
         if (index !== -1) {
           this.products[index] = updatedProduct;
         }
 
-        // Reset the file input and checkbox
         fileInput.value = '';
         this.makeNewImagePrimary = false;
       },

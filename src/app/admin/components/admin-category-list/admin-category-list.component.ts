@@ -26,10 +26,6 @@ export class AdminCategoryListComponent {
   loadCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (data) => this.categories = data,
-      /**
-       * Called when an error occurs while fetching categories.
-       * Sets the component's `error` field to the provided error message.
-       */
       error: () => this.error = 'Error fetching categories'
     });
   }

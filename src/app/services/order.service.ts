@@ -40,7 +40,7 @@ export class OrderService {
     return this.http.get<Order>(`${this.ordersUrl}/${id}`);
   }
 
-  // Changed from PATCH to POST to avoid CORS issues
+  
   updateOrderPaymentStatus(id: number, status: string): Observable<Order> {
     return this.http.post<Order>(`${this.ordersUrl}/${id}/payment-status`, null, {
       params: { status }

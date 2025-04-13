@@ -1,0 +1,139 @@
+<div class="product-detail-container">
+    <!-- Breadcrumb navigation -->
+    <div class="breadcrumb">
+      <a href="javascript:void(0)" (click)="goToProductList()">Products</a>
+      <span *ngIf="product?.category"> &gt; 
+        <a href="javascript:void(0)" (click)="goToProductList()">{{ product?.category?.name }}</a>
+      </span>
+      <span> &gt; {{ product?.name || 'Product Details' }}</span>
+    </div>
+    
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading product details...</p>
+    </div>
+    
+    <!-- Error message -->
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+      <button (click)="goToProductList()">Return to Products</button>
+    </div>
+    
+    <!-- Product details -->
+    <div *ngIf="product && !isLoading" class="product-content">
+      <div class="product-gallery">
+        <!-- Main product image -->
+        <div class="main-image">
+          <img 
+            *ngIf="product.images && product.images[activeImageIndex]"
+            [src]="baseUrl + product.images[activeImageIndex].imageUrl" 
+            [alt]="product.name"
+            (click)="openFullImage(activeImageIndex)">
+          
+          <!-- Fallback for no images -->
+          <img 
+            *ngIf="(!product.images || product.images.length === 0) && product.imageUrl"
+            [src]="baseUrl + product.imageUrl" 
+            [alt]="product.name">
+            
+          <!-- Image navigation buttons -->
+          <div class="image-controls" *ngIf="product.images && product.images.length > 1">
+            <button class="prev-btn" (click)="prevImage()">&lt;</button>
+            <button class="next-btn" (click)="nextImage()">&gt;</button>
+          </div>
+        </div>
+        
+        <!-- Thumbnail gallery -->
+        <div class="thumbnails" *ngIf="product.images && product.images.length > 1">
+          <div 
+            *ngFor="let image of product.images; let i = index" 
+            class="thumbnail" 
+            [class.active]="i === activeImageIndex"
+            (click)="setActiveImage(i)">
+            <img [src]="baseUrl + image.imageUrl" [alt]="product.name + ' thumbnail'">
+          </div>
+        </div>
+      </div>
+      
+      <div class="product-info">
+        <h1 class="product-name">{{ product.name }}</h1>
+        
+        <p class="product-category">Category: {{ product.category?.name }}</p>
+        
+        <div class="product-price">${{ product.price.toFixed(2) }}</div>
+        
+        <div class="product-description">
+          <h3>Description</h3>
+          <p>{{ product.description || 'No description available.' }}</p>
+        </div>
+        
+        <div class="product-stock" [ngClass]="{
+          'out-of-stock': (product.stock ?? 0) === 0,
+          'low-stock': (product.stock ?? 0) > 0 && (product.stock ?? 0) < 5
+        }">
+          <span *ngIf="(product.stock ?? 0) === 0">Out of Stock</span>
+          <span *ngIf="(product.stock ?? 0) > 0 && (product.stock ?? 0) < 5">Low Stock: {{ product.stock }} left</span>
+          <span *ngIf="(product.stock ?? 0) >= 5">In Stock: {{ product.stock }} available</span>
+        </div>
+        
+        <!-- Add to cart section -->
+        <div class="add-to-cart" *ngIf="(product.stock ?? 0) > 0">
+          <div class="quantity-selector">
+            <label for="quantity">Quantity:</label>
+            <div class="quantity-controls">
+              <button 
+                (click)="quantityToAdd = quantityToAdd - 1; validateQuantity()"
+                [disabled]="quantityToAdd <= 1">-</button>
+              <input 
+                type="number" 
+                id="quantity" 
+                [(ngModel)]="quantityToAdd" 
+                min="1" 
+                [max]="product.stock ?? 1"
+                (change)="validateQuantity()">
+              <button 
+                (click)="quantityToAdd = quantityToAdd + 1; validateQuantity()"
+                [disabled]="product.stock !== undefined && quantityToAdd >= product.stock">+</button>
+            </div>
+          </div>
+          
+          <button 
+            class="add-to-cart-btn" 
+            (click)="addToCart()"
+            [disabled]="(product.stock ?? 0) <= 0">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Related products section -->
+    <div *ngIf="relatedProducts.length > 0" class="related-products">
+      <h2>Related Products</h2>
+      <div class="related-products-grid">
+        <div *ngFor="let relatedProduct of relatedProducts" class="related-product-card">
+          <a (click)="goToProductDetail(relatedProduct.id!)">
+            <div class="related-product-image">
+              <img 
+                *ngIf="relatedProduct.imageUrl" 
+                [src]="baseUrl + relatedProduct.imageUrl" 
+                [alt]="relatedProduct.name">
+            </div>
+            <div class="related-product-info">
+              <h3>{{ relatedProduct.name }}</h3>
+              <p class="related-product-price">${{ relatedProduct.price.toFixed(2) }}</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Fullsize image modal -->
+  <div class="image-modal" *ngIf="fullImageUrl" (click)="closeFullImage()">
+    <div class="image-modal-content">
+      <img [src]="fullImageUrl" [alt]="product?.name || 'Product image'">
+      <span class="close-button" (click)="closeFullImage()">&times;</span>
+    </div>
+  </div>

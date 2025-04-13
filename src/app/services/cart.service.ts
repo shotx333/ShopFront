@@ -9,7 +9,7 @@ export interface CartItem {
   id?: number;
   productId: number;
   quantity: number;
-  // Optionally, add other fields if the backend returns them.
+  
 }
 
 export interface Cart {
@@ -28,14 +28,14 @@ export class CartService {
 
   constructor(private http: HttpClient) { }
 
-  // Retrieve the cart from the backend.
+  
   fetchCart(): Observable<Cart> {
     return this.http.get<Cart>(this.cartUrl).pipe(
       tap(cart => this.cartSubject.next(cart))
     );
   }
 
-  // Add or update an item in the cart.
+  
   addItem(productId: number, quantity: number = 1): Observable<Cart> {
     return this.http.post<Cart>(`${this.cartUrl}/item`, null, {
       params: { productId: productId.toString(), quantity: quantity.toString() }
@@ -44,7 +44,7 @@ export class CartService {
     );
   }
 
-  // Remove an item from the cart.
+  
   removeItem(productId: number): Observable<Cart> {
     return this.http.delete<Cart>(`${this.cartUrl}/item`, {
       params: { productId: productId.toString() }
@@ -53,7 +53,7 @@ export class CartService {
     );
   }
 
-  // Update an item’s quantity.
+  
   updateItem(productId: number, quantity: number): Observable<Cart> {
     return this.http.put<Cart>(`${this.cartUrl}/item`, null, {
       params: { productId: productId.toString(), quantity: quantity.toString() }

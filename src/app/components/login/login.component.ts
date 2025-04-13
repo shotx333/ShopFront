@@ -27,12 +27,10 @@ info: any;
   }
 
   ngOnInit(): void {
-    // If user is already logged in, redirect them away from the login page.
     if (this.authService.isLoggedIn()) {
       this.handleRedirect();
     }
     
-    // Check if we have a redirect URL stored
     this.redirectUrl = localStorage.getItem('redirectUrl');
   }
 
@@ -47,15 +45,11 @@ info: any;
   }
   
   private handleRedirect(): void {
-    // Check if we have a stored redirect URL
     const redirectUrl = localStorage.getItem('redirectUrl');
     if (redirectUrl) {
-      // Clear the stored URL
       localStorage.removeItem('redirectUrl');
-      // Redirect to the stored URL
       this.router.navigateByUrl(redirectUrl);
     } else {
-      // Default redirect to products page
       this.router.navigate(['/products']);
     }
   }

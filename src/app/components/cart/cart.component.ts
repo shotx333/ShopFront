@@ -42,7 +42,6 @@ export class CartComponent implements OnInit {
       next: (cart) => {
         this.cart = cart;
 
-        // If cart is not empty, load all product details
         if (cart && cart.items.length > 0) {
           const productIds = [...new Set(cart.items.map(item => item.productId))];
           const productRequests = productIds.map(id =>
@@ -78,7 +77,6 @@ export class CartComponent implements OnInit {
   getItemSubtotal(item: CartItem): string {
     const price = this.getProductPrice(item.productId);
     const subtotal = price * item.quantity;
-    // Format to 2 decimal places
     return subtotal.toFixed(2);
   }
 
@@ -90,7 +88,6 @@ export class CartComponent implements OnInit {
       return total + (price * item.quantity);
     }, 0);
     
-    // Format to 2 decimal places
     return total.toFixed(2);
   }
 
@@ -108,11 +105,8 @@ export class CartComponent implements OnInit {
       item.quantity = 1;
     }
 
-    // Ensure quantity doesn't exceed available stock
     const product = this.products.get(item.productId);
     if (product && product.stock !== undefined && item.quantity > product.stock) {
-      // We don't automatically adjust it here to make the user aware
-      // Will be highlighted as a warning instead
     }
   }
 
@@ -124,7 +118,7 @@ export class CartComponent implements OnInit {
     this.cartService.updateItem(productId, quantity).subscribe({
       next: (cart) => {
         this.cart = cart;
-        this.loadCart(); // Reload to get fresh product data
+        this.loadCart();
       },
       error: (err) => this.error = err.error || 'Error updating item'
     });
@@ -143,7 +137,6 @@ export class CartComponent implements OnInit {
       return;
     }
 
-    // Check for stock issues before placing order
     if (this.hasStockIssues()) {
       this.error = 'Please update quantities - some items exceed available stock.';
       return;
@@ -156,7 +149,6 @@ export class CartComponent implements OnInit {
 
     this.orderService.placeOrder(orderItems).subscribe({
       next: (response) => {
-        // Navigate to checkout with the new order ID
         this.router.navigate(['/checkout', response.order.id]);
       },
       error: (err) => this.error = err.error || 'Error placing order'

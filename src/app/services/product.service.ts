@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import baseUrl from './helper';
 
@@ -43,6 +43,33 @@ export class ProductService {
     return this.http.get<Product[]>(this.productsUrl, { headers });
   }
 
+  
+  searchProducts(query?: string, categories?: number[]): Observable<Product[]> {
+    let params = new HttpParams();
+    
+    if (query) {
+      params = params.set('query', query);
+    }
+    
+    if (categories && categories.length > 0) {
+      
+      categories.forEach(categoryId => {
+        params = params.append('categories', categoryId.toString());
+      });
+    }
+    
+    const headers = new HttpHeaders({
+      'Cache-Control': 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    
+    return this.http.get<Product[]>(`${this.productsUrl}/search`, { 
+      headers,
+      params 
+    });
+  }
+
   getProduct(id: number): Observable<Product> {
     const headers = new HttpHeaders({
       'Cache-Control': 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
@@ -64,14 +91,14 @@ export class ProductService {
     return this.http.delete(`${this.productsUrl}/${id}`);
   }
 
-  // Upload a primary image for a product (legacy method)
+  
   uploadImage(productId: number, file: File): Observable<Product> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<Product>(`${this.productsUrl}/${productId}/upload-image`, formData);
   }
 
-  // Add an additional image to a product
+  
   addProductImage(productId: number, file: File, isPrimary: boolean = false): Observable<Product> {
     const formData = new FormData();
     formData.append('file', file);
@@ -79,17 +106,17 @@ export class ProductService {
     return this.http.post<Product>(`${this.productsUrl}/${productId}/images`, formData);
   }
 
-  // Delete a product image
+  
   deleteProductImage(productId: number, imageId: number): Observable<Product> {
     return this.http.delete<Product>(`${this.productsUrl}/${productId}/images/${imageId}`);
   }
 
-  // Set an image as the primary product image
+  
   setPrimaryProductImage(productId: number, imageId: number): Observable<Product> {
     return this.http.put<Product>(`${this.productsUrl}/${productId}/images/${imageId}/primary`, {});
   }
 
-  // Reorder product images
+  
   reorderProductImages(productId: number, imageIds: number[]): Observable<Product> {
     return this.http.put<Product>(`${this.productsUrl}/${productId}/images/reorder`, imageIds);
   }

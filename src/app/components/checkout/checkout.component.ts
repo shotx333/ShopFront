@@ -19,7 +19,7 @@ export class CheckoutComponent implements OnInit {
 
   stripe: any;
   elements: any;
-  card: any; // Add this declaration for the Stripe card element
+  card: any;
   clientSecret: string = '';
   paymentError: string = '';
   processingPayment: boolean = false;
@@ -35,19 +35,16 @@ export class CheckoutComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // Get the order ID from the route
     this.route.params.subscribe(params => {
       this.orderId = +params['id'];
       this.loadOrder();
     });
 
-    // Initialize Stripe
     this.stripe = Stripe
-    ('pk_test_51QzgnP09iJFm7rsGRVoP5ZFC9y4ZlJAVZCgCr0jIBI4jmPaTyJuVReI1lGSkiF4vq9ANjVyHMgGJZRs4MYsgGe2L00YzdJILQ3'); // Replace with your public key
+    ('pk_test_51QzgnP09iJFm7rsGRVoP5ZFC9y4ZlJAVZCgCr0jIBI4jmPaTyJuVReI1lGSkiF4vq9ANjVyHMgGJZRs4MYsgGe2L00YzdJILQ3');
   }
 
   ngAfterViewInit() {
-    // Wait for the card element to be ready
     setTimeout(() => {
       this.setupStripeElements();
     }, 500);
@@ -99,11 +96,9 @@ export class CheckoutComponent implements OnInit {
       }
     };
 
-    // Create the card element
     this.card = this.elements.create('card', { style });
     this.card.mount(this.cardElement.nativeElement);
 
-    // Add event listeners
     this.card.addEventListener('change', (event: any) => {
       const displayError = document.getElementById('card-errors');
       if (event.error && displayError) {
@@ -129,18 +124,16 @@ export class CheckoutComponent implements OnInit {
         payment_method: {
           card: this.card,
           billing_details: {
-            name: 'Customer Name' // You can collect this from the user
+            name: 'Customer Name'
           }
         }
       });
 
       if (result.error) {
-        // Show error to your customer
         this.paymentError = result.error.message || 'An error occurred during payment.';
         this.processingPayment = false;
       } else {
         if (result.paymentIntent.status === 'succeeded') {
-          // Payment succeeded, update the order
           this.paymentSuccess = true;
           this.updateOrderPaymentStatus();
         }
@@ -153,7 +146,6 @@ export class CheckoutComponent implements OnInit {
   }
 
   updateOrderPaymentStatus() {
-    // Update order status to PAID
     this.orderService.updateOrderPaymentStatus(this.orderId, 'PAID').subscribe({
       next: () => {
         this.processingPayment = false;
