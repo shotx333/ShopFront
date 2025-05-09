@@ -32,7 +32,7 @@
           <div class="image-preview-popup">
             <div *ngFor="let image of product.images" class="image-item">
               <img [src]="baseUrl+image.imageUrl" alt="{{ product.name }}" width="50" height="50">
-              <span *ngIf="image.primary" class="primary-badge">Primary</span>
+              <span *ngIf="image.isPrimary" class="primary-badge">Primary</span>
             </div>
           </div>
         </div>
@@ -40,6 +40,7 @@
     </td>
     <td>
       <button (click)="deleteProduct(product.id!)">Delete</button>
+      <button (click)="openPriceUpdateModal(product)">Update Price</button>
       <button (click)="openStockUpdateModal(product)">Update Stock</button>
       <button (click)="manageProductImages(product)">Manage Images</button>
     </td>
@@ -47,6 +48,27 @@
   </tbody>
 </table>
 <a routerLink="/admin/products/new">Add New Product</a>
+
+<!-- Price Update Modal -->
+<div *ngIf="showPriceModal" class="modal">
+  <div class="modal-content">
+    <h3>Update Price for {{ selectedProduct?.name }}</h3>
+    <p>Current Price: {{ selectedProduct?.price }}</p>
+    <form (ngSubmit)="updatePrice()">
+      <label>
+        New Price:
+        <input type="number" [(ngModel)]="newPriceValue" [ngModelOptions]="{standalone: true}" min="0.01" step="0.01">
+      </label>
+      <div *ngIf="newPriceValue < 0.01" class="error-message">
+        Price must be at least 0.01
+      </div>
+      <div class="modal-actions">
+        <button type="button" (click)="closePriceModal()">Cancel</button>
+        <button type="submit" [disabled]="newPriceValue < 0.01">Update</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <!-- Stock Update Modal -->
 <div *ngIf="showStockModal" class="modal">
@@ -75,8 +97,8 @@
       <div *ngFor="let image of selectedProduct?.images" class="product-image-item">
         <img [src]="baseUrl+image.imageUrl" alt="{{ selectedProduct?.name }}">
         <div class="image-actions">
-          <button *ngIf="!image.primary" (click)="setAsPrimaryImage(selectedProduct?.id!, image.id!)">Set as Primary</button>
-          <span *ngIf="image.primary" class="primary-badge">Primary Image</span>
+          <button *ngIf="!image.isPrimary" (click)="setAsPrimaryImage(selectedProduct?.id!, image.id!)">Set as Primary</button>
+          <span *ngIf="image.isPrimary" class="primary-badge">Primary Image</span>
           <button (click)="deleteProductImage(selectedProduct?.id!, image.id!)">Delete</button>
         </div>
       </div>
@@ -89,11 +111,19 @@
         <input type="checkbox" id="makePrimary" [(ngModel)]="makeNewImagePrimary">
         <label for="makePrimary">Set as primary image</label>
       </div>
-      <!-- Update this button in your admin-product-list.component.html -->
-      <button (click)="addNewImage(selectedProduct!.id!, newImageInput)">Upload Image</button>    </div>
+      <button (click)="addNewImage(selectedProduct!.id!, newImageInput)">Upload Image</button>
+    </div>
 
     <div class="modal-actions">
       <button (click)="closeImagesModal()">Close</button>
     </div>
   </div>
 </div>
+
+<style>
+  .error-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 5px;
+  }
+</style>

@@ -112,6 +112,12 @@ table {
       }
     }
 
+    .error-message {
+      color: red;
+      font-size: 0.8em;
+      margin-bottom: 10px;
+    }
+
     .modal-actions {
       display: flex;
       justify-content: flex-end;
@@ -203,5 +209,10 @@ button {
 
   &:hover {
     background-color: #e8e8e8;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }

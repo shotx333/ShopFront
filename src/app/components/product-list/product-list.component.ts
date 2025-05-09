@@ -131,7 +131,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
         this.products = data.map(product => {
           let primaryIndex = 0;
           if (product.images && product.images.length > 0) {
-            const primaryImageIndex = product.images.findIndex(img => img.primary);
+            // Fix: Check for isPrimary instead of primary
+            const primaryImageIndex = product.images.findIndex(img => img.isPrimary === true);
             if (primaryImageIndex >= 0) {
               primaryIndex = primaryImageIndex;
             }
@@ -152,6 +153,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       }
     });
   }
+  
 
   searchProducts(updateUrl: boolean = true) {
     if (this.isSearching || (this.searchQuery === this.lastSearchQuery && this.searchActive)) {
@@ -193,7 +195,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
         this.products = data.map(product => {
           let primaryIndex = 0;
           if (product.images && product.images.length > 0) {
-            const primaryImageIndex = product.images.findIndex(img => img.primary);
+            const primaryImageIndex = product.images.findIndex(img => img.isPrimary);
             if (primaryImageIndex >= 0) {
               primaryIndex = primaryImageIndex;
             }

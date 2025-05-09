@@ -104,7 +104,7 @@
 
 <!-- Fullsize image modal -->
 <div class="image-modal" *ngIf="fullImageUrl" (click)="closeFullImage()">
-  <div class="image-modal-content">
+  <div class="image-modal-content" (click)="$event.stopPropagation()">
     <img [src]="fullImageUrl" [alt]="fullImageAlt">
     <span class="close-button" (click)="closeFullImage()">&times;</span>
   </div>

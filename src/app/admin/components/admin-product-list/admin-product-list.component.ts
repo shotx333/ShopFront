@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Product, ProductService } from '../../../services/product.service';
-import { NgForOf, NgIf,  NgClass } from '@angular/common';
+import { NgForOf, NgIf, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import baseUrl from '../../../services/helper';
@@ -23,9 +23,11 @@ export class AdminProductListComponent {
   products: Product[] = [];
   error: string = '';
   showStockModal: boolean = false;
+  showPriceModal: boolean = false;
   showImagesModal: boolean = false;
   selectedProduct: Product | null = null;
   newStockValue: number = 0;
+  newPriceValue: number = 0;
   makeNewImagePrimary: boolean = false;
 
   constructor(private productService: ProductService) {}
@@ -64,6 +66,17 @@ export class AdminProductListComponent {
     this.selectedProduct = null;
   }
 
+  openPriceUpdateModal(product: Product): void {
+    this.selectedProduct = product;
+    this.newPriceValue = product.price;
+    this.showPriceModal = true;
+  }
+
+  closePriceModal(): void {
+    this.showPriceModal = false;
+    this.selectedProduct = null;
+  }
+
   updateStock(): void {
     if (!this.selectedProduct) return;
 
@@ -80,6 +93,32 @@ export class AdminProductListComponent {
       },
       error: () => {
         this.error = 'Error updating stock';
+      }
+    });
+  }
+
+  updatePrice(): void {
+    if (!this.selectedProduct) return;
+
+    // Validate price
+    if (this.newPriceValue < 0.01) {
+      this.error = 'Price must be at least 0.01';
+      return;
+    }
+
+    const updatedProduct: Product = {
+      ...this.selectedProduct,
+      price: this.newPriceValue
+    };
+
+    this.productService.updateProduct(this.selectedProduct.id!, updatedProduct).subscribe({
+      next: () => {
+        this.closePriceModal();
+        this.loadProducts();
+        alert('Price updated successfully');
+      },
+      error: (err) => {
+        this.error = err.error || 'Error updating price';
       }
     });
   }

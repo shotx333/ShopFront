@@ -58,7 +58,7 @@ export class ProductDetailComponent implements OnInit {
         
         // Set the active image to the primary image if it exists
         if (product.images && product.images.length > 0) {
-          const primaryIndex = product.images.findIndex(img => img.primary);
+          const primaryIndex = product.images.findIndex(img => img.isPrimary);
           this.activeImageIndex = primaryIndex >= 0 ? primaryIndex : 0;
         }
         

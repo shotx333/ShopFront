@@ -11,7 +11,7 @@ export interface Category {
 export interface ProductImage {
   id?: number;
   imageUrl: string;
-  primary?: boolean;
+  isPrimary?: boolean;
   displayOrder?: number;
 }
 
@@ -102,7 +102,7 @@ export class ProductService {
   addProductImage(productId: number, file: File, isPrimary: boolean = false): Observable<Product> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('primary', isPrimary.toString());
+    formData.append('isPrimary', isPrimary.toString());
     return this.http.post<Product>(`${this.productsUrl}/${productId}/images`, formData);
   }
 
