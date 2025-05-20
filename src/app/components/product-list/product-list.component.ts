@@ -37,10 +37,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   searchQuery: string = '';
   searchActive: boolean = false;
-  
+
   private lastSearchQuery: string = '';
   protected isSearching: boolean = false;
-  
+
   private routerSubscription: Subscription | null = null;
   private queryParamSubscription: Subscription | null = null;
 
@@ -57,10 +57,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadCategories();
-    
+
     this.queryParamSubscription = this.route.queryParams.subscribe(params => {
       let needsDataRefresh = false;
-      
+
       if (params['categoryId']) {
         const categoryId = Number(params['categoryId']);
         if (categoryId === 0) {
@@ -70,14 +70,14 @@ export class ProductListComponent implements OnInit, OnDestroy {
         }
         needsDataRefresh = true;
       }
-      
+
       if (params['query'] && params['query'] !== this.lastSearchQuery) {
         this.searchQuery = params['query'];
         this.lastSearchQuery = params['query'];
         this.searchActive = true;
         needsDataRefresh = true;
       }
-      
+
       if (needsDataRefresh) {
         if (this.searchActive) {
           this.searchProducts(false);
@@ -86,7 +86,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
         }
       }
     });
-    
+
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -97,12 +97,12 @@ export class ProductListComponent implements OnInit, OnDestroy {
           this.loadProducts();
         }
       });
-      
+
     if (!this.searchActive) {
       this.loadProducts();
     }
   }
-  
+
   ngOnDestroy() {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
@@ -125,7 +125,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   loadProducts() {
     if (this.isSearching) return;
-    
+
     this.productService.getProducts().subscribe({
       next: data => {
         this.products = data.map(product => {
@@ -137,7 +137,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
               primaryIndex = primaryImageIndex;
             }
           }
-          
+
           return {
             ...product,
             quantityToAdd: product.stock && product.stock > 0 ? 1 : 0,
@@ -153,18 +153,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
 
   searchProducts(updateUrl: boolean = true) {
-    if (this.isSearching || (this.searchQuery === this.lastSearchQuery && this.searchActive)) {
-      return;
+    if (this.isSearching) {
+            return;
     }
-    
     if (!this.searchQuery || this.searchQuery.trim() === '') {
       this.searchActive = false;
       this.lastSearchQuery = '';
       this.loadProducts();
-      
+
       if (updateUrl) {
         this.router.navigate([], {
           relativeTo: this.route,
@@ -174,13 +173,13 @@ export class ProductListComponent implements OnInit, OnDestroy {
       }
       return;
     }
-    
+
     this.searchActive = true;
     this.isSearching = true;
     this.lastSearchQuery = this.searchQuery;
-    
+
     const categoryIds = this.selectedCategories.length > 0 ? this.selectedCategories : undefined;
-    
+
     this.productService.searchProducts(this.searchQuery, categoryIds).subscribe({
       next: data => {
         if (updateUrl) {
@@ -191,7 +190,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
             replaceUrl: true
           });
         }
-        
+
         this.products = data.map(product => {
           let primaryIndex = 0;
           if (product.images && product.images.length > 0) {
@@ -200,14 +199,14 @@ export class ProductListComponent implements OnInit, OnDestroy {
               primaryIndex = primaryImageIndex;
             }
           }
-          
+
           return {
             ...product,
             quantityToAdd: product.stock && product.stock > 0 ? 1 : 0,
             activeImageIndex: primaryIndex
           };
         });
-        
+
         this.filterProducts();
         this.error = '';
         this.isSearching = false;
@@ -224,13 +223,13 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.searchQuery = '';
     this.lastSearchQuery = '';
     this.searchActive = false;
-    
+
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { query: null },
       queryParamsHandling: 'merge'
     });
-    
+
     this.loadProducts();
   }
 
@@ -249,7 +248,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       this.selectedCategories = [];
     }
     this.filterProducts();
-    
+
     if (this.searchActive) {
       this.searchProducts();
     }
@@ -262,7 +261,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       this.selectedCategories.push(categoryId);
     }
     this.filterProducts();
-    
+
     if (this.searchActive) {
       this.searchProducts();
     }
@@ -271,7 +270,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   clearFilters(): void {
     this.selectedCategories = [];
     this.filterProducts();
-    
+
     if (this.searchActive) {
       this.searchProducts();
     }
@@ -326,7 +325,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       alert('Please log in to add items to your cart.');
       return;
     }
-    
+
     this.cartService.addItem(product.id!, quantity).subscribe({
       next: () => {
         alert(`${quantity} ${product.name}(s) added to cart.`);
