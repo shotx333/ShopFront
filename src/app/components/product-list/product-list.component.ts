@@ -46,6 +46,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   fullImageUrl: string | null = null;
   fullImageAlt: string = '';
+  searchErrorMessage: string = '';
 
   constructor(
     private productService: ProductService,
@@ -154,16 +155,27 @@ export class ProductListComponent implements OnInit, OnDestroy {
     });
   }
 
-
   searchProducts(updateUrl: boolean = true) {
-    if (this.isSearching) {
-            return;
+    if (this.isSearching) return;
+  
+    const trimmedQuery = this.searchQuery?.trim() || '';
+  
+    if (trimmedQuery.length > 0 && trimmedQuery.length < 3) {
+      // Show error and do NOT call backend
+      this.searchErrorMessage = 'Minimum 3 characters required for search';
+      this.searchActive = false;
+      this.products = []; // optionally clear products or keep old?
+      return;
     }
-    if (!this.searchQuery || this.searchQuery.trim() === '') {
+  
+    // Clear error when valid query or empty query
+    this.searchErrorMessage = '';
+  
+    if (trimmedQuery === '') {
       this.searchActive = false;
       this.lastSearchQuery = '';
       this.loadProducts();
-
+  
       if (updateUrl) {
         this.router.navigate([], {
           relativeTo: this.route,
@@ -173,13 +185,14 @@ export class ProductListComponent implements OnInit, OnDestroy {
       }
       return;
     }
-
+  
+    // Valid search query ≥ 3 chars - proceed
     this.searchActive = true;
     this.isSearching = true;
     this.lastSearchQuery = this.searchQuery;
-
+  
     const categoryIds = this.selectedCategories.length > 0 ? this.selectedCategories : undefined;
-
+  
     this.productService.searchProducts(this.searchQuery, categoryIds).subscribe({
       next: data => {
         if (updateUrl) {
@@ -190,7 +203,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
             replaceUrl: true
           });
         }
-
+  
         this.products = data.map(product => {
           let primaryIndex = 0;
           if (product.images && product.images.length > 0) {
@@ -208,16 +221,18 @@ export class ProductListComponent implements OnInit, OnDestroy {
         });
 
         this.filterProducts();
+  
         this.error = '';
         this.isSearching = false;
       },
-      error: (err) => {
-        console.error('Error searching products', err);
-        this.error = 'Error searching products. Please try again later.';
+      error: err => {
+        console.error('Search error', err);
+        this.error = 'Error occurred while searching products.';
         this.isSearching = false;
       }
     });
   }
+  
 
   clearSearch() {
     this.searchQuery = '';
@@ -359,17 +374,12 @@ export class ProductListComponent implements OnInit, OnDestroy {
     product.activeImageIndex = newIndex;
   }
 
-  openFullImage(product: ProductWithQuantity, imageIndex: number): void {
-    if (product.images && product.images.length > 0) {
-      const imageUrl = baseUrl + product.images[imageIndex].imageUrl;
-      this.fullImageUrl = imageUrl;
-      this.fullImageAlt = product.name;
-    }
-  }
-
   closeFullImage(): void {
     this.fullImageUrl = null;
   }
-
+  goToProductDetail(productId: number | undefined): void {
+    this.router.navigate(['/products', productId]);
+  }
+  
   protected readonly baseUrl = baseUrl;
 }

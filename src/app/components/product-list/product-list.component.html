@@ -22,6 +22,9 @@
     </div>
   </div>
 
+  <div *ngIf="searchErrorMessage" class="search-error-message" style="color: red;">
+    {{ searchErrorMessage }}
+  </div>
   <!-- Product List -->
   <div class="product-content">
     <h2>Products</h2>
@@ -41,7 +44,7 @@
                  [src]="baseUrl+image.imageUrl"
                  alt="{{ product.name }}"
                  [class.active]="i === getActiveImageIndex(product)"
-                 (click)="openFullImage(product, i)">
+                 (click)="goToProductDetail(product.id)">
           </div>
       
           <div class="carousel-indicators" *ngIf="product.images.length > 1">

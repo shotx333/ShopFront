@@ -416,3 +416,48 @@
     width: 100%;
   }
 }
+
+  /* Full image modal */
+  .image-modal {
+    display: flex;
+    position: fixed;
+    z-index: 9999; /* Increased z-index to ensure it's on top */
+    left: 0;
+    top: 0;
+    width: 100vw; /* Use viewport units instead of percentage */
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  
+    .image-modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  
+      img {
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+        display: block; /* Ensure block display */
+      }
+  
+      .close-button {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: white;
+        font-size: 36px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 5px;
+        line-height: 1;
+      }
+    }
+    }
+  
