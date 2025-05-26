@@ -20,7 +20,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
   private authStatusSubscription: Subscription | null = null;
   private routerSubscription: Subscription | null = null;
-  
+
   searchQuery: string = '';
   private lastSearchQuery: string = '';
 
@@ -32,18 +32,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCategories();
-    
+
     this.authStatusSubscription = this.authService.authStatus.subscribe(status => {
       this.isLoggedIn = status;
     });
     this.isLoggedIn = this.authService.isLoggedIn();
-    
+
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const queryParam = urlParams.get('query');
-        
+
         if (queryParam) {
           this.searchQuery = queryParam;
           this.lastSearchQuery = queryParam;
@@ -73,17 +73,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
   logout() {
     this.authService.logout();
   }
-  
+
   search(): void {
     const trimmedQuery = this.searchQuery.trim();
-    
+
     if (trimmedQuery === this.lastSearchQuery || trimmedQuery === '') {
       return;
     }
-    
+
     this.lastSearchQuery = trimmedQuery;
-    
-    this.router.navigate(['/products'], { 
+
+    this.router.navigate(['/products'], {
       queryParams: { query: trimmedQuery }
     });
   }

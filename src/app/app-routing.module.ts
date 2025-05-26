@@ -12,26 +12,36 @@ import { OrderFormComponent } from './components/order-form/order-form.component
 import { OrderListComponent } from './components/order-list/order-list.component';
 import { CartComponent } from './components/cart/cart.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
 
-// Export the routes so that they can be imported elsewhere.
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: '', component: ProductListComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'products', component: ProductListComponent },
-  { path: 'products/:id', component: ProductDetailComponent },
-  { path: 'products/new', component: ProductFormComponent },
-  { path: 'categories', component: CategoryListComponent },
-  { path: 'categories/new', component: CategoryFormComponent },
-  { path: 'orders/new', component: OrderFormComponent },
-  { path: 'cart', component: CartComponent },
-  { path: 'checkout/:id', component: CheckoutComponent },
-  { path: 'orders', component: OrderListComponent },
-  { path: 'admin', loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule) }
+  { path: '', redirectTo: 'products', pathMatch: 'full' },
+
+  { path: 'login',            component: LoginComponent },
+  { path: 'register',         component: RegisterComponent },
+
+  { path: 'products',         component: ProductListComponent },
+  { path: 'products/new',     component: ProductFormComponent },
+  { path: 'products/:id',     component: ProductDetailComponent },
+
+  { path: 'categories',       component: CategoryListComponent },
+  { path: 'categories/new',   component: CategoryFormComponent },
+
+  { path: 'orders/new',       component: OrderFormComponent },
+  { path: 'orders',           component: OrderListComponent },
+
+  { path: 'cart',             component: CartComponent },
+  { path: 'checkout/:id',     component: CheckoutComponent },
+
+  { path: 'change-password',  component: ChangePasswordComponent },
+
+  /* Lazy-loaded admin section */
+  { path: 'admin',            loadChildren: () =>
+      import('./admin/admin.module').then(m => m.AdminModule) }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

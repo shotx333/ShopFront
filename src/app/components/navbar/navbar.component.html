@@ -3,30 +3,30 @@
     <div class="logo-container">
       <a routerLink="/">Shop</a>
     </div>
-    
+
     <div class="search-container">
       <input type="text" placeholder="Search products..." [(ngModel)]="searchQuery" (keyup.enter)="search()">
       <button (click)="search()">Search</button>
     </div>
-    
+
     <div class="links-container">
       <a routerLink="/products">Products</a>
-      
+
       <div class="dropdown">
         <a class="dropdown-toggle">Categories</a>
         <div class="dropdown-menu">
           <a routerLink="/products" [queryParams]="{categoryId: 0}">All Categories</a>
-          <a *ngFor="let category of categories" 
-             routerLink="/products" 
+          <a *ngFor="let category of categories"
+             routerLink="/products"
              [queryParams]="{categoryId: category.id}">
             {{ category.name }}
           </a>
         </div>
       </div>
-      
+
       <a routerLink="/cart">Cart</a>
       <a routerLink="/orders">Orders</a>
-      
+
       <span *ngIf="isLoggedIn">
         <button (click)="logout()">Logout</button>
       </span>
