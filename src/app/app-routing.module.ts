@@ -13,6 +13,7 @@ import { OrderListComponent } from './components/order-list/order-list.component
 import { CartComponent } from './components/cart/cart.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
+import { EditAccountComponent } from './components/edit-account/edit-account.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'products', pathMatch: 'full' },
@@ -34,6 +35,8 @@ export const routes: Routes = [
   { path: 'checkout/:id',     component: CheckoutComponent },
 
   { path: 'change-password',  component: ChangePasswordComponent },
+  
+  { path: 'account/edit', component: EditAccountComponent },
 
   /* Lazy-loaded admin section */
   { path: 'admin',            loadChildren: () =>

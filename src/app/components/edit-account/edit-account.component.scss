@@ -1,0 +1,5 @@
+.tabs { display: flex; gap: 32px; margin: 16px 0; }
+.tabs span     { cursor: pointer; font-weight: 600; color: #666; }
+.tabs .active  { color: #000; border-bottom: 2px solid #000; }
+
+.breadcrumbs { color: #666; margin-bottom: 8px; }

@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../../services/user.service';
+import { User } from '../../models/user.model';
 
 
 @Component({
@@ -18,6 +20,10 @@ import { FormsModule } from '@angular/forms';
 export class NavbarComponent implements OnInit, OnDestroy {
   categories: Category[] = [];
   isLoggedIn: boolean = false;
+  user?: User;
+  dropdownOpen = false;
+  // defaultAvatar = 'assets/default-avatar.jpg';
+  defaultAvatar = 'default-avatar.jpg';
   private authStatusSubscription: Subscription | null = null;
   private routerSubscription: Subscription | null = null;
 
@@ -25,10 +31,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private lastSearchQuery: string = '';
 
   constructor(
-    private authService: AuthService,
+    private userService: UserService,
+    public authService: AuthService,
     private categoryService: CategoryService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -52,6 +59,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this.lastSearchQuery = '';
         }
       });
+      
   }
 
   ngOnDestroy(): void {
@@ -69,11 +77,24 @@ export class NavbarComponent implements OnInit, OnDestroy {
       error: () => console.error('Error loading categories')
     });
   }
-
+  fetchUser(): void {
+    this.userService.me().subscribe(u => this.user = u);
+  }
+  toggleDropdown(ev: Event): void {
+    ev.stopPropagation();               // avoid body-click closing immediately
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+  
   logout() {
     this.authService.logout();
-  }
+    this.dropdownOpen = false;
 
+  }
+  goAccount(): void {
+    // adjust the route if you used a different path
+    window.location.href = '/account/edit';
+    this.dropdownOpen = false;
+  }
   search(): void {
     const trimmedQuery = this.searchQuery.trim();
 

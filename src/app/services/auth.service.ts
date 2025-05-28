@@ -60,18 +60,26 @@ export class AuthService {
   /* ------------------------------------------------ *
    *  LOGIN / REGISTER
    * ------------------------------------------------ */
-  login(username: string, password: string): Observable<void> {
-    return this.http.post<string>(`${baseUrl}/auth/login`, { username, password })
-      .pipe(
-        tap(token => {
-          this.setToken(token);
-          this.startTokenValidationLoop();
-          this.authEvent.sendAuthEvent();
-        }),
-        /** convert the emitted token (string) to void for callers */
-        map(() => undefined)
-      );
-  }
+/* ------------------------------------------------ *
+ *  LOGIN
+ * ------------------------------------------------ */
+login(username: string, password: string): Observable<void> {
+  return this.http.post(
+    `${baseUrl}/auth/login`,
+    { username, password },
+
+    /* tell HttpClient the response is plain text */
+    { responseType: 'text' }          //  ← added
+  ).pipe(
+    tap((token: string) => {          // token is now the raw text
+      this.setToken(token);
+      this.startTokenValidationLoop();
+      this.authEvent.sendAuthEvent();
+    }),
+    map(() => undefined)              // convert to Observable<void>
+  );
+}
+
 
   register(username: string, email: string, password: string): Observable<void> {
     return this.http.post<void>(`${baseUrl}/auth/register`, { username, email, password });

@@ -1,0 +1,49 @@
+<div class="panel">
+    <div class="photo">
+      <img [src]="avatarPreview" alt="avatar" style="width: 200px; height: 200px;">
+      <label class="upload-btn">
+        <input type="file" accept="image/png,image/jpeg" (change)="onFileSelected($event)">
+        Upload
+      </label>
+    </div>
+  
+    <form [formGroup]="form" (ngSubmit)="save()" *ngIf="form">
+      <div class="grid">
+        <div>
+          <label>Email</label>
+          <input formControlName="email">
+        </div>
+        <div>
+          <label>Name</label>
+          <input formControlName="firstName">
+        </div>
+        <div>
+          <label>Surname</label>
+          <input formControlName="lastName">
+        </div>
+        <div>
+          <label>Birth year</label>
+          <input type="number" formControlName="birthYear">
+        </div>
+        <div>
+          <label>Phone number</label>
+          <input formControlName="phoneNumber">
+        </div>
+        <div>
+          <label>Gender</label>
+          <select formControlName="gender">
+            <option value="">–</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+      </div>
+  
+      <div class="actions">
+        <button type="submit">SAVE</button>
+        <span class="saved" *ngIf="saved">Saved ✓</span>
+      </div>
+    </form>
+  </div>
+  

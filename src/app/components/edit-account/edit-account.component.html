@@ -1,0 +1,11 @@
+<div class="breadcrumbs">Home &gt; Edit account</div>
+
+<h2>Personal Info</h2>
+
+<nav class="tabs">
+    <span [class.active]="tab==='info'" (click)="tab='info'">EDIT INFORMATION</span>
+    <span [class.active]="tab==='password'" (click)="tab='password'">CHANGE PASSWORD</span>
+</nav>
+
+<app-edit-info *ngIf="tab==='info'"></app-edit-info>
+<app-change-password *ngIf="tab==='password'"></app-change-password>

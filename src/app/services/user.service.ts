@@ -22,13 +22,13 @@ export class UserService {
 
   update(profile: Partial<User>): Observable<User> {
     return this.http.put<User>(`${baseUrl}/users/me`, profile,
-      { headers: this.authHeaders() });
+                               { headers: this.authHeaders() });
   }
 
   uploadAvatar(file: File): Observable<string> {
     const fd = new FormData();
     fd.append('file', file);
     return this.http.post(`${baseUrl}/users/me/avatar`, fd,
-      { headers: this.authHeaders(), responseType: 'text' });
+                          { headers: this.authHeaders(), responseType: 'text' });
   }
 }

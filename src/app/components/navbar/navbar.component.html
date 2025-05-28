@@ -35,6 +35,17 @@
         <a class="register" routerLink="/register">Register</a>
       </span>
     </div>
+    <div class="avatar-area" *ngIf="authService.isLoggedIn()" (click)="toggleDropdown($event)">
+      <img  class="avatar"
+            [src]="user?.avatarUrl || defaultAvatar"
+            alt="avatar">
+    
+      <ul class="avatar-menu" *ngIf="dropdownOpen">
+        <li (click)="goAccount()">Edit account</li>
+        <li (click)="logout()">Log out</li>
+      </ul>
+    </div>
   </div>
+
 </nav>
 <hr>

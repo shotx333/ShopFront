@@ -1,0 +1,14 @@
+.panel { background: #fff; padding: 24px; border-radius: 8px; }
+.photo { display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+.photo img { width:64px; height:64px; border-radius:8px; object-fit:cover; }
+.upload-btn { cursor:pointer; color:#007bff; }
+.upload-btn input { display:none; }
+
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px; }
+.grid div { display:flex; flex-direction:column; gap:4px; }
+.grid label { font-size:13px; color:#555; }
+
+.actions { margin-top:32px; display:flex; align-items:center; gap:16px; }
+button { background:#ffc107; border:none; padding:8px 24px; border-radius:4px;
+         cursor:pointer; font-weight:600; }
+.saved { color:green; }
