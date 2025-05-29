@@ -6,6 +6,18 @@ import { Router } from '@angular/router';
 import baseUrl from './helper';
 import { AuthEventService } from './auth-event.service';
 
+
+interface RegisterDto {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  birthYear: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -57,12 +69,7 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  /* ------------------------------------------------ *
-   *  LOGIN / REGISTER
-   * ------------------------------------------------ */
-/* ------------------------------------------------ *
- *  LOGIN
- * ------------------------------------------------ */
+
 login(username: string, password: string): Observable<void> {
   return this.http.post(
     `${baseUrl}/auth/login`,
@@ -81,9 +88,9 @@ login(username: string, password: string): Observable<void> {
 }
 
 
-  register(username: string, email: string, password: string): Observable<void> {
-    return this.http.post<void>(`${baseUrl}/auth/register`, { username, email, password });
-  }
+register(dto: RegisterDto): Observable<void>{
+  return this.http.post<void>(`${baseUrl}/auth/register`, dto);
+}
 
   /* ------------------------------------------------ *
    *  CHANGE-PASSWORD
@@ -109,18 +116,18 @@ login(username: string, password: string): Observable<void> {
     const tokenLifespan = 60 * 60 * 1000; // 1 hour (Redis TTL)
     this.tokenExpirationTimer = setTimeout(() => this.logout(), tokenLifespan);
 
-    this.http.get(`${baseUrl}/auth/admin-check`, { observe: 'response' })
-      .pipe(
-        catchError(err => {
-          if (err.status === 401 || err.status === 403) {
-            console.log('Token invalid/expired – logging out');
-            this.logout();
-          }
-          return throwError(() => err);
-        })
-      ).subscribe({
-      next : () => this.authStatus.next(true),
-      error: () => {}
-    });
+    // this.http.get(`${baseUrl}/auth/admin-check`, { observe: 'response' })
+    //   .pipe(
+    //     catchError(err => {
+    //       if (err.status === 401 || err.status === 403) {
+    //         console.log('Token invalid/expired – logging out');
+    //         this.logout();
+    //       }
+    //       return throwError(() => err);
+    //     })
+    //   ).subscribe({
+    //   next : () => this.authStatus.next(true),
+    //   error: () => {}
+    // });
   }
 }

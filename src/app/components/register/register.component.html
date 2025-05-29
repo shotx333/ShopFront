@@ -1,42 +1,52 @@
-<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-  <div>
-    <label>Username</label>
-    <input type="text" formControlName="username" />
-    <div *ngIf="submitted && f['username'].errors" class="error-msg">
-      <div *ngIf="f['username'].errors?.['required']">Username is required</div>
-      <div *ngIf="f['username'].errors?.['minlength']">Minimum 4 characters</div>
-      <div *ngIf="f['username'].errors?.['maxlength']">Maximum 20 characters</div>
-      <div *ngIf="f['username'].errors?.['pattern']">Invalid format</div>
+<h2>Register</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div class="grid">
+    <div>
+      <label class="required">Username</label>
+      <input formControlName="username">
+    </div>
+
+    <div>
+      <label class="required">Email</label>
+      <input formControlName="email">
+    </div>
+
+    <div>
+      <label class="required">Password</label>
+      <input type="password" formControlName="password">
+    </div>
+
+    <div>
+      <label class="required">First name</label>
+      <input formControlName="firstName">
+    </div>
+
+    <div>
+      <label class="required">Last name</label>
+      <input formControlName="lastName">
+    </div>
+
+    <div>
+      <label class="required">Phone number</label>
+      <input formControlName="phoneNumber">
+    </div>
+
+    <div>
+      <label class="required">Gender</label>
+      <select formControlName="gender">
+        <option value="MALE">Male</option>
+        <option value="FEMALE">Female</option>
+        <option value="OTHER">Other</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="required">Birth year</label>
+      <input type="number" formControlName="birthYear">
     </div>
   </div>
 
-  <div>
-    <label>Email</label>
-    <input type="email" formControlName="email" />
-    <div *ngIf="submitted && f['email'].errors" class="error-msg">
-      <div *ngIf="f['email'].errors?.['required']">Email is required</div>
-      <div *ngIf="f['email'].errors?.['email']">Invalid email format</div>
-    </div>
-  </div>
-
-  <div>
-    <label>Password</label>
-    <input type="password" formControlName="password" />
-    <div *ngIf="submitted && f['password'].errors" class="error-msg">
-      <div *ngIf="f['password'].errors?.['required']">Password is required</div>
-      <div *ngIf="f['password'].errors?.['minlength']">Minimum 8 characters</div>
-      <div *ngIf="f['password'].errors?.['pattern']">Must include uppercase, lowercase, number</div>
-    </div>
-  </div>
-
-  <div>
-    <label>Confirm Password</label>
-    <input type="password" formControlName="confirmPassword" />
-    <div *ngIf="submitted && (f['confirmPassword'].errors || registerForm.errors?.['mismatch'])" class="error-msg">
-      <div *ngIf="f['confirmPassword'].errors?.['required']">Confirm Password is required</div>
-      <div *ngIf="registerForm.errors?.['mismatch']">Passwords do not match</div>
-    </div>
-  </div>
-
-  <button type="submit">Register</button>
+  <button type="submit" [disabled]="form.invalid">Register</button>
+  <p class="error-msg" *ngIf="error">{{ error }}</p>
 </form>
