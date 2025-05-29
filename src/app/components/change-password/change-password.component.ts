@@ -9,7 +9,8 @@ import { HttpErrorResponse } from '@angular/common/http';
   selector   : 'app-change-password',
   templateUrl: './change-password.component.html',
   standalone : true,
-  imports    : [CommonModule, ReactiveFormsModule]
+  imports    : [CommonModule, ReactiveFormsModule],
+  styleUrls  : ['./change-password.component.scss'],
 })
 export class ChangePasswordComponent implements OnInit {
 

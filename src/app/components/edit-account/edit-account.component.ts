@@ -8,7 +8,7 @@ import { EditInfoComponent } from '../edit-info/edit-info.component';
   standalone : true,
   selector   : 'app-edit-account',
   templateUrl: './edit-account.component.html',
-  styleUrls  : ['./edit-account.component.css'],
+  styleUrls  : ['./edit-account.component.scss'],
   imports: [CommonModule, RouterModule, EditInfoComponent, ChangePasswordComponent]
 })
 export class EditAccountComponent implements OnInit {

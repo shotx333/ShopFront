@@ -1,6 +1,6 @@
 import { OrderItem } from "./order.service";
 
-let baseUrl = 'http://localhost:8080';
+let baseUrl = 'https://3d22-188-129-225-117.ngrok-free.app';
 export default baseUrl; 
 
 export function formatPrice(price: number | undefined): string {

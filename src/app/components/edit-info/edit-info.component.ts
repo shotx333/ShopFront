@@ -9,7 +9,7 @@ import { switchMap } from 'rxjs';
   standalone : true,
   selector   : 'app-edit-info',
   templateUrl: './edit-info.component.html',
-  styleUrls  : ['./edit-info.component.css'],
+  styleUrls  : ['./edit-info.component.scss'],
   imports    : [CommonModule, ReactiveFormsModule]
 })
 export class EditInfoComponent implements OnInit {
