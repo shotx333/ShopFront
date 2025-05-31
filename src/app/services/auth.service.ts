@@ -116,18 +116,5 @@ register(dto: RegisterDto): Observable<void>{
     const tokenLifespan = 60 * 60 * 1000; // 1 hour (Redis TTL)
     this.tokenExpirationTimer = setTimeout(() => this.logout(), tokenLifespan);
 
-    // this.http.get(`${baseUrl}/auth/admin-check`, { observe: 'response' })
-    //   .pipe(
-    //     catchError(err => {
-    //       if (err.status === 401 || err.status === 403) {
-    //         console.log('Token invalid/expired – logging out');
-    //         this.logout();
-    //       }
-    //       return throwError(() => err);
-    //     })
-    //   ).subscribe({
-    //   next : () => this.authStatus.next(true),
-    //   error: () => {}
-    // });
   }
 }
